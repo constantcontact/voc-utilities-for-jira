@@ -5,7 +5,7 @@ voc-utilities-for-jira
 
 VOC Utilities plugin for Jira 6.x is a collection of features specific to the Voice Of Customer (VoC) and Escaping Defect Management.
 
-### modules
+### Modules
 1. "VOC Priority Field Validator" constrains the transition if the issue is one of {Bug, Defect} issue types and requires the Priority field to not be the value "None".
 2. "VOC Severity Field Validator" constrains the transition if the issue is one of {Bug, Defect} issue types and requires the Severity field to not be null ("None").
 3. "VOC Issue Guidance Web Panel" adds a web panel in the right pane of the issue view screen, if there is a value to render.
