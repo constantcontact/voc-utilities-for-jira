@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html xmlns:xlink="http://www.w3.org/1999/xlink">
+<meta charset="utf-8">
+<style>
+body {
+  font: 10px sans-serif;
+  background: #FFFFFF;
+}
+separator {
+  stroke-width: 1;
+  stroke: lightgray;
+}
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+.x.axis path {
+  display: none;
+}
+.chart {
+  float: left;
+}
+.grid .tick {
+    stroke: #CCCCCC;
+    opacity: 0.1;
+}
+.line {
+  fill: none;
+  stroke: black;
+  stroke-width: 1px;
+}
+.createdLine {
+  fill: none;
+  stroke: darkred;
+  stroke-width: 1px;
+}
+.resolvedLine {
+  fill: none;
+  stroke: green;
+  stroke-width: 1px;
+}
+.regressionLine {
+  fill: none;
+  stroke: red;
+  stroke-width: 1.5px;
+}
+.chartTitle {
+  text-wrap: normal;
+  font-size: 14px;
+  display: inline-block;
+  width: $w;
+  text-align: center;
+}
+div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: 60px;
+  height: 34px;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: lightsteelblue;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
+  opacity: 0;
+}
+</style>
+<body>
+   #disable_html_escaping()
+<!--
+projects = $p
+data = $data
+-->
+<div style="width:$wbc;float:left;padding: 0px 10px;">
+<div><span class=chartTitle><br>$title</span></div><br>
+<svg class="chart"></svg>
+</div>
+<script>
+var latestUrl = "$refreshUrl";
+var w = $w;
+var h = $h;
+var trendHeight = $trendHeight;
+var data = $data;
+var lastMonthPercentDone = $lastMonthPercentDone;
+var fontSize = 11;
+var title = "$title";
+var useHardCodedData = $hc;
+var averageAdd = $average;
+//var lifetimeAvgTTL = $lifetimeAvgTTL;
+if (useHardCodedData) {
+data = [{"crU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-11-01 AND created<2012-12-01) AND resolutiondate<2012-12-01","arU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (resolutiondate>=2012-11-01 AND resolutiondate<2012-12-01)","ou":13,"c":0,"or":0,"ar":0,"add":0,"cu":0,"cU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-11-01 AND created<2012-12-01)","r":8,"saU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-11-01 AND created<2012-12-01) AND resolution is EMPTY          ","ouU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2012-05-01 AND (resolutiondate>=2012-12-01 OR resolution is EMPTY)","month":"2012-11-30","ad":"-","orU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2012-05-01 AND (resolutiondate>=2012-11-01 AND resolutiondate<2012-12-01)","rrU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-05-01 AND created<2012-11-01) AND (resolutiondate>=2012-11-01 AND resolutiondate<2012-12-01)","ru":8,"ruU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-05-01 AND created<2012-11-01) AND (resolutiondate>=2012-12-01 OR resolution is EMPTY)","cuU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-11-01 AND created<2012-12-01) AND (resolutiondate>=2012-12-01 OR resolution is EMPTY)","rU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-05-01 AND created<2012-11-01) AND (resolutiondate>=2012-11-01 OR resolution is EMPTY)"},{"crU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-12-01 AND created<2013-01-01) AND resolutiondate<2013-01-01","arU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (resolutiondate>=2012-12-01 AND resolutiondate<2013-01-01)","ou":13,"c":3,"or":0,"ar":0,"add":3,"cu":3,"cU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-12-01 AND created<2013-01-01)","r":8,"saU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-12-01 AND created<2013-01-01) AND resolution is EMPTY          ","ouU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2012-06-01 AND (resolutiondate>=2013-01-01 OR resolution is EMPTY)","month":"2012-12-31","ad":"-","orU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2012-06-01 AND (resolutiondate>=2012-12-01 AND resolutiondate<2013-01-01)","rrU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-06-01 AND created<2012-12-01) AND (resolutiondate>=2012-12-01 AND resolutiondate<2013-01-01)","ru":8,"ruU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-06-01 AND created<2012-12-01) AND (resolutiondate>=2013-01-01 OR resolution is EMPTY)","cuU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-12-01 AND created<2013-01-01) AND (resolutiondate>=2013-01-01 OR resolution is EMPTY)","rU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-06-01 AND created<2012-12-01) AND (resolutiondate>=2012-12-01 OR resolution is EMPTY)"},{"crU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-01-01 AND created<2013-02-01) AND resolutiondate<2013-02-01","arU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (resolutiondate>=2013-01-01 AND resolutiondate<2013-02-01)","ou":13,"c":2,"or":0,"ar":0,"add":2,"cu":2,"cU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-01-01 AND created<2013-02-01)","r":11,"saU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-01-01 AND created<2013-02-01) AND resolution is EMPTY          ","ouU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2012-07-01 AND (resolutiondate>=2013-02-01 OR resolution is EMPTY)","month":"2013-01-31","ad":"-","orU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2012-07-01 AND (resolutiondate>=2013-01-01 AND resolutiondate<2013-02-01)","rrU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-07-01 AND created<2013-01-01) AND (resolutiondate>=2013-01-01 AND resolutiondate<2013-02-01)","ru":11,"ruU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-07-01 AND created<2013-01-01) AND (resolutiondate>=2013-02-01 OR resolution is EMPTY)","cuU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-01-01 AND created<2013-02-01) AND (resolutiondate>=2013-02-01 OR resolution is EMPTY)","rU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-07-01 AND created<2013-01-01) AND (resolutiondate>=2013-01-01 OR resolution is EMPTY)"},{"crU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-02-01 AND created<2013-03-01) AND resolutiondate<2013-03-01","arU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (resolutiondate>=2013-02-01 AND resolutiondate<2013-03-01)","ou":15,"c":6,"or":0,"ar":0,"add":6,"cu":6,"cU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-02-01 AND created<2013-03-01)","r":11,"saU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-02-01 AND created<2013-03-01) AND resolution is EMPTY          ","ouU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2012-08-01 AND (resolutiondate>=2013-03-01 OR resolution is EMPTY)","month":"2013-02-28","ad":"-","orU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2012-08-01 AND (resolutiondate>=2013-02-01 AND resolutiondate<2013-03-01)","rrU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-08-01 AND created<2013-02-01) AND (resolutiondate>=2013-02-01 AND resolutiondate<2013-03-01)","ru":11,"ruU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-08-01 AND created<2013-02-01) AND (resolutiondate>=2013-03-01 OR resolution is EMPTY)","cuU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-02-01 AND created<2013-03-01) AND (resolutiondate>=2013-03-01 OR resolution is EMPTY)","rU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-08-01 AND created<2013-02-01) AND (resolutiondate>=2013-02-01 OR resolution is EMPTY)"},{"crU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-03-01 AND created<2013-04-01) AND resolutiondate<2013-04-01","arU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (resolutiondate>=2013-03-01 AND resolutiondate<2013-04-01)","ou":18,"c":19,"or":1,"ar":1,"add":18,"cu":19,"cU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-03-01 AND created<2013-04-01)","r":13,"saU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-03-01 AND created<2013-04-01) AND resolution is EMPTY          ","ouU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2012-09-01 AND (resolutiondate>=2013-04-01 OR resolution is EMPTY)","month":"2013-03-31","ad":"453","orU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2012-09-01 AND (resolutiondate>=2013-03-01 AND resolutiondate<2013-04-01)","rrU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-09-01 AND created<2013-03-01) AND (resolutiondate>=2013-03-01 AND resolutiondate<2013-04-01)","ru":13,"ruU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-09-01 AND created<2013-03-01) AND (resolutiondate>=2013-04-01 OR resolution is EMPTY)","cuU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-03-01 AND created<2013-04-01) AND (resolutiondate>=2013-04-01 OR resolution is EMPTY)","rU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-09-01 AND created<2013-03-01) AND (resolutiondate>=2013-03-01 OR resolution is EMPTY)"},{"crU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-04-01 AND created<2013-05-01) AND resolutiondate<2013-05-01","arU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (resolutiondate>=2013-04-01 AND resolutiondate<2013-05-01)","ou":20,"c":33,"or":0,"ar":2,"add":31,"cu":31,"cU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-04-01 AND created<2013-05-01)","r":30,"saU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-04-01 AND created<2013-05-01) AND resolution is EMPTY          ","ouU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2012-10-01 AND (resolutiondate>=2013-05-01 OR resolution is EMPTY)","month":"2013-04-30","ad":"0","orU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2012-10-01 AND (resolutiondate>=2013-04-01 AND resolutiondate<2013-05-01)","rrU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-10-01 AND created<2013-04-01) AND (resolutiondate>=2013-04-01 AND resolutiondate<2013-05-01)","ru":30,"ruU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-10-01 AND created<2013-04-01) AND (resolutiondate>=2013-05-01 OR resolution is EMPTY)","cuU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-04-01 AND created<2013-05-01) AND (resolutiondate>=2013-05-01 OR resolution is EMPTY)","rU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-10-01 AND created<2013-04-01) AND (resolutiondate>=2013-04-01 OR resolution is EMPTY)"},{"crU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-05-01 AND created<2013-06-01) AND resolutiondate<2013-06-01","arU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (resolutiondate>=2013-05-01 AND resolutiondate<2013-06-01)","ou":20,"c":93,"or":0,"ar":8,"add":85,"cu":86,"cU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-05-01 AND created<2013-06-01)","r":61,"saU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-05-01 AND created<2013-06-01) AND resolution is EMPTY          ","ouU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2012-11-01 AND (resolutiondate>=2013-06-01 OR resolution is EMPTY)","month":"2013-05-31","ad":"20","orU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2012-11-01 AND (resolutiondate>=2013-05-01 AND resolutiondate<2013-06-01)","rrU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-11-01 AND created<2013-05-01) AND (resolutiondate>=2013-05-01 AND resolutiondate<2013-06-01)","ru":60,"ruU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-11-01 AND created<2013-05-01) AND (resolutiondate>=2013-06-01 OR resolution is EMPTY)","cuU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-05-01 AND created<2013-06-01) AND (resolutiondate>=2013-06-01 OR resolution is EMPTY)","rU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-11-01 AND created<2013-05-01) AND (resolutiondate>=2013-05-01 OR resolution is EMPTY)"},{"crU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-06-01 AND created<2013-07-01) AND resolutiondate<2013-07-01","arU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (resolutiondate>=2013-06-01 AND resolutiondate<2013-07-01)","ou":20,"c":50,"or":0,"ar":42,"add":8,"cu":32,"cU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-06-01 AND created<2013-07-01)","r":146,"saU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-06-01 AND created<2013-07-01) AND resolution is EMPTY          ","ouU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2012-12-01 AND (resolutiondate>=2013-07-01 OR resolution is EMPTY)","month":"2013-06-30","ad":"25","orU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2012-12-01 AND (resolutiondate>=2013-06-01 AND resolutiondate<2013-07-01)","rrU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-12-01 AND created<2013-06-01) AND (resolutiondate>=2013-06-01 AND resolutiondate<2013-07-01)","ru":122,"ruU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-12-01 AND created<2013-06-01) AND (resolutiondate>=2013-07-01 OR resolution is EMPTY)","cuU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-06-01 AND created<2013-07-01) AND (resolutiondate>=2013-07-01 OR resolution is EMPTY)","rU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2012-12-01 AND created<2013-06-01) AND (resolutiondate>=2013-06-01 OR resolution is EMPTY)"},{"crU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-07-01 AND created<2013-08-01) AND resolutiondate<2013-08-01","arU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (resolutiondate>=2013-07-01 AND resolutiondate<2013-08-01)","ou":19,"c":84,"or":4,"ar":48,"add":36,"cu":60,"cU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-07-01 AND created<2013-08-01)","r":151,"saU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-07-01 AND created<2013-08-01) AND resolution is EMPTY          ","ouU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2013-01-01 AND (resolutiondate>=2013-08-01 OR resolution is EMPTY)","month":"2013-07-31","ad":"66","orU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2013-01-01 AND (resolutiondate>=2013-07-01 AND resolutiondate<2013-08-01)","rrU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-01-01 AND created<2013-07-01) AND (resolutiondate>=2013-07-01 AND resolutiondate<2013-08-01)","ru":131,"ruU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-01-01 AND created<2013-07-01) AND (resolutiondate>=2013-08-01 OR resolution is EMPTY)","cuU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-07-01 AND created<2013-08-01) AND (resolutiondate>=2013-08-01 OR resolution is EMPTY)","rU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-01-01 AND created<2013-07-01) AND (resolutiondate>=2013-07-01 OR resolution is EMPTY)"},{"crU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-08-01 AND created<2013-09-01) AND resolutiondate<2013-09-01","arU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (resolutiondate>=2013-08-01 AND resolutiondate<2013-09-01)","ou":16,"c":177,"or":4,"ar":72,"add":105,"cu":133,"cU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-08-01 AND created<2013-09-01)","r":190,"saU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-08-01 AND created<2013-09-01) AND resolution is EMPTY          ","ouU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2013-02-01 AND (resolutiondate>=2013-09-01 OR resolution is EMPTY)","month":"2013-08-31","ad":"47","orU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2013-02-01 AND (resolutiondate>=2013-08-01 AND resolutiondate<2013-09-01)","rrU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-02-01 AND created<2013-08-01) AND (resolutiondate>=2013-08-01 AND resolutiondate<2013-09-01)","ru":166,"ruU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-02-01 AND created<2013-08-01) AND (resolutiondate>=2013-09-01 OR resolution is EMPTY)","cuU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-08-01 AND created<2013-09-01) AND (resolutiondate>=2013-09-01 OR resolution is EMPTY)","rU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-02-01 AND created<2013-08-01) AND (resolutiondate>=2013-08-01 OR resolution is EMPTY)"},{"crU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-09-01 AND created<2013-10-01) AND resolutiondate<2013-10-01","arU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (resolutiondate>=2013-09-01 AND resolutiondate<2013-10-01)","ou":18,"c":159,"or":2,"ar":102,"add":57,"cu":104,"cU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-09-01 AND created<2013-10-01)","r":295,"saU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-09-01 AND created<2013-10-01) AND resolution is EMPTY          ","ouU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2013-03-01 AND (resolutiondate>=2013-10-01 OR resolution is EMPTY)","month":"2013-09-30","ad":"29","orU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2013-03-01 AND (resolutiondate>=2013-09-01 AND resolutiondate<2013-10-01)","rrU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-03-01 AND created<2013-09-01) AND (resolutiondate>=2013-09-01 AND resolutiondate<2013-10-01)","ru":250,"ruU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-03-01 AND created<2013-09-01) AND (resolutiondate>=2013-10-01 OR resolution is EMPTY)","cuU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-09-01 AND created<2013-10-01) AND (resolutiondate>=2013-10-01 OR resolution is EMPTY)","rU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-03-01 AND created<2013-09-01) AND (resolutiondate>=2013-09-01 OR resolution is EMPTY)"},{"crU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-10-01 AND created<2013-11-01) AND resolutiondate<2013-11-01","arU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (resolutiondate>=2013-10-01 AND resolutiondate<2013-11-01)","ou":32,"c":124,"or":2,"ar":129,"add":-5,"cu":74,"cU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-10-01 AND created<2013-11-01)","r":338,"saU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-10-01 AND created<2013-11-01) AND resolution is EMPTY          ","ouU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2013-04-01 AND (resolutiondate>=2013-11-01 OR resolution is EMPTY)","month":"2013-10-31","ad":"48","orU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2013-04-01 AND (resolutiondate>=2013-10-01 AND resolutiondate<2013-11-01)","rrU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-04-01 AND created<2013-10-01) AND (resolutiondate>=2013-10-01 AND resolutiondate<2013-11-01)","ru":261,"ruU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-04-01 AND created<2013-10-01) AND (resolutiondate>=2013-11-01 OR resolution is EMPTY)","cuU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-10-01 AND created<2013-11-01) AND (resolutiondate>=2013-11-01 OR resolution is EMPTY)","rU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-04-01 AND created<2013-10-01) AND (resolutiondate>=2013-10-01 OR resolution is EMPTY)"},{"crU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-11-01 AND created<2013-12-01) AND resolutiondate<2013-12-01","arU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (resolutiondate>=2013-11-01 AND resolutiondate<2013-12-01)","ou":51,"c":54,"or":1,"ar":60,"add":-6,"cu":32,"cU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-11-01 AND created<2013-12-01)","r":315,"saU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-11-01 AND created<2013-12-01) AND resolution is EMPTY          ","ouU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2013-05-01 AND (resolutiondate>=2013-12-01 OR resolution is EMPTY)","month":"2013-11-30","ad":"26","orU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND created<2013-05-01 AND (resolutiondate>=2013-11-01 AND resolutiondate<2013-12-01)","rrU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-05-01 AND created<2013-11-01) AND (resolutiondate>=2013-11-01 AND resolutiondate<2013-12-01)","ru":278,"ruU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-05-01 AND created<2013-11-01) AND (resolutiondate>=2013-12-01 OR resolution is EMPTY)","cuU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-11-01 AND created<2013-12-01) AND (resolutiondate>=2013-12-01 OR resolution is EMPTY)","rU":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=(issuetype = Defect AND category in (\"Core Applications\", \"Internal Applications\") AND project in (\"EMM Development\")) AND (created>=2013-05-01 AND created<2013-11-01) AND (resolutiondate>=2013-11-01 OR resolution is EMPTY)"}];
+  averageAdd = 7.5;
+  lastMonthPercentDone = 0.5;
+  //lifetimeAvgTTL = 46.72352634324465; 
+}  
+//------------------------------------------------------------------------
+function currentUnresolvedHadRoom(d,y,lineHeight) {
+  return y(0) - y(d.cu) > lineHeight;
+}
+function currentResolvedHadRoom(d,y,lineHeight) {
+  return y(d.cu) - y(d.c) > lineHeight;
+}
+function getYforCurrentResolved(d,y,lineHeight,shiftUp) {
+  return currentUnresolvedHadRoom(d,y,lineHeight)
+    ? currentResolvedHadRoom(d,y,lineHeight)
+       ? (y(d.c) + y(d.cu)) / 2.0
+       : y(d.cu) + shiftUp
+    : getYforCurrentUnresolved(d,y,lineHeight,shiftUp) + 1.5*shiftUp;
+}
+function getYforCurrentUnresolved(d,y,lineHeight,shiftUp) {
+       return currentUnresolvedHadRoom(d,y,lineHeight) 
+         ? y(d.cu / 2.0) // y(d.cu) - shiftUp // there's space
+         : y(d.c) + shiftUp;//y(d.cu) + shiftUp; // got squished
+}
+function recentUnresolvedHadRoom(d,y,lineHeight,shiftUp) {
+  return y(0) - y(d.ru) > lineHeight;
+}
+function recentResolvedHadRoom(d,y,lineHeight,shiftUp) {
+  return y(d.ru) - y(d.r) > lineHeight;
+}
+function getYforRecentUnresolved(d,y,lineHeight,shiftUp) {
+  return recentUnresolvedHadRoom(d,y,lineHeight,shiftUp)
+         ? y(-d.ru/2.0) //+ shiftUp // there's room
+         : y(-d.ru) - shiftUp; // squished
+}
+function getYforRecentResolved(d,y,lineHeight,shiftUp) {
+  return recentUnresolvedHadRoom(d,y,lineHeight,shiftUp)
+    ? recentResolvedHadRoom(d,y,lineHeight,shiftUp)
+      ? (y(-d.r) + y(-d.ru)) / 2.0
+      : y(-d.ru) - shiftUp
+    : getYforRecentUnresolved(d,y,lineHeight,shiftUp) - 1.5*shiftUp;
+}
+function getXforDataPoint(d,data,x,half) {
+      var offset = d.month == data[data.length-1].month ? 0 : -half;
+      return x(d.month) + offset + getWidthForBar(d,data,x,half);
+}
+function getXforDataPointSparkline(d,data,x,half) {
+    return x(d.month) + half;
+}
+function getWidthForBar(d,data,x,half) {
+  var monthWidth = x.rangeBand()-1;
+  return d.month == data[data.length-1].month
+    ? lastMonthPercentDone*monthWidth
+    : monthWidth;
+}
+function transformForBar(d,x) {
+  return "translate(" + (x(d.month)+1) + "," + 0 + ")"; 
+}
+
+var parseDate = d3.time.format("%Y-%m-%d").parse;
+var formatDate = d3.time.format("%b '%y");
+var formatYear = d3.time.format("%Y");
+var formatMonth = d3.time.format("%b");
+var formatMonth2 = d3.time.format("%B");
+function getMonthSummary(d,title) {
+  date = formatMonth2(parseDate(d.month)) + " " + formatYear(parseDate(d.month));
+  month = formatMonth2(parseDate(d.month)) + "";
+  return "<head>"
+   + "<style>"
+   + "body { font-family: Sans-Serif; font-size:small; } "
+   + "#summary { font-family:sans-serif; font-size:small; width:100%; border-collapse:collapse; } "
+   + "#summary td, #summary th {font-size:1.2em; border:1px solid #98bf21; padding:3px 7px 2px 7px; } "
+   + "#summary th {font-size:1.4em; text-align:left; padding-top:5px; padding-bottom:4px; background-color:#A7C942; color:#fff; } "
+   + "#summary tr.alt td {color:#000; background-color:#EAF2D3; }"
+   + "</style>"
+   + "<title>"+date+" $title</title>"
+   + "</head>"
+   + "<h1>$title</h1>"
+   + "<h2>"+date+" Summary</h2>"
+   + "Here are the numbers for "+date+", <b>from top to bottom</b>:<br><br>"
+   + "<table id=summary>"
+   + "<tr>"
+   + "  <th>Value</th>"
+   + "  <th>Description</th>"
+   + "</tr>"
+   + "<tr>"
+   + "  <td>"+d.add+"</td>"
+   + "  <td>Net Added defects in "+date+" (Created minus Resolved)</td> "
+   + "</tr>"
+   + "<tr class='alt'>"
+   + "  <td>"+(d.c > d.ar ? d.c : d.ar)+"</td>"
+   + "  <td>"+(d.c > d.ar ? "Defects created in "+date+"" : "Defects resolved in "+date+" of any age")+"</td> "
+   + "</tr>"
+   + "<tr>"
+   + "  <td>"+(d.c > d.ar ? d.ar : d.c)+"</td>"
+   + "  <td>"+(d.c > d.ar ? "Defects resolved in "+date+" of any age" : "Defects created in "+date+"")+"</td> "
+   + "</tr>"
+   + "<tr class='alt'>"
+   + "  <td>"+d.c+"</td>"
+   + "  <td>Total of defects created in "+date+" (sum of the next two numbers: "+(d.c-d.cu)+"+"+d.cu+")</td> "
+   + "</tr>"
+   + "<tr>"
+   + "  <td>"+(d.c - d.cu)+"</td>"
+   + "  <td>Defects created and resolved in "+date+" (thickness of upper green area)</td> "
+   + "</tr>"
+   + "<tr class='alt'>"
+   + "  <td>"+d.cu+"</td>"
+   + "  <td>Defects created but not resolved in "+date+" (thickness of red area above x-axis)</td> "
+   + "</tr>"
+   + "<tr>"
+   + "  <td>"+d.ru+"</td>"
+   + "  <td>Defects 1 to $n months old left unresolved at end of "+date+" (thickness of red area below x-axis)</td> "
+   + "</tr>"
+   + "<tr class='alt'>"
+   + "  <td>"+(d.r - d.ru)+"</td>"
+   + "  <td>Defects 1 to $n months old resolved during "+date+" (thickness of lower green area)</td> "
+   + "</tr>"
+   + "<tr>"
+   + "  <td>"+d.r+"</td>"
+   + "  <td>Total of defects 1 to $n months old (sum of the previous two numbers: "+d.ru+"+"+(d.r-d.ru)+")</td> "
+   + "</tr>"
+   + "<tr class='alt'>"
+   + "  <td>"+d.or+"</td>"
+   + "  <td>Defects older than $n months resolved during "+date+" (>$n" + "M Res)</td> "
+   + "</tr>"
+   + "<tr>"
+   + "  <td>"+d.ou+"</td>"
+   + "  <td>Defects older than $n months still unresolved at end of "+date+" (>$n" + "M Unr)</td> "
+   + "</tr>"
+   + "<tr class='alt'>"
+   + "  <td>"+d.ad+"</td>"
+   + "  <td>Average number of days defects resolved during "+date+" had been unresolved</td> "
+   + "</tr>"
+   + "</table>"
+   + "<h2>Additional Notes</h2>"
+   + "<ul>"
+   + "<li>You can see the month-over-month change in Net Add summarized to the left of the sparkline:</li>"
+   + "<ul>"
+   + "<li>The first number on the left labeled 'MoM' is the change in Net Add expected every month based on linear regression. A positive value indicates an expectation that Net Add will get worse every month. A negative value indicates the opposite.</li>"
+   + "<li>The second number on the left is the ratio of the first number to the average Net Add for the selected time period, expressed as a percentage. This is intended to help you compare projects or time periods which have different volumes. This percentage is used as the slope for the line drawn on the small square graph below R<sup>2</sup> which should make such comparisions glancable.</li>"
+   + "<li>The third number on the left is the R<sup>2</sup> linear regression fit which can be interpreted as the percent confidence the trend will continue (example: interpret R<sup>2</sup> 0.20 as 20% confidence the trend will continue).</li>"
+   + "</ul>"
+   + "<li>Green shading is used throughout visualization to represent defects of various ages resolved in a given month.</li>"
+   + "<li>Red shading is used throughout the visualization to represent defects of various ages left unresolved by the end of a given month.</li>"
+   + "<li>Above the x-axis we visualize work done on defects created in a given month. Below the x-axis is work on defects created before a given month (defects one to $n months old). You can think of this as an iceberg with the waterline at the x-axis. The shaded green area represents melting (defects resolved) during any given month, above and below the waterline. The red area is ice that remains (defects left unresolved) at the end of any given month. However, defects older than $n months are tracked beneath this area chart in the two lines of numbers labeled '>" +$n + "M Res' and '>" +$n + "M Unr'.</li>"
+   + "<li>All counts of defects resolved are green. The overall Resolved total in 'Created vs Resolved' is the sum of the green numbers under it. The defect(s) resolved during "+date+" were these: "+(d.c-d.cu)+" defect(s) less than one month old, "+(d.r-d.ru)+" defect(s) from one to $n months old, and "+d.or+" defect(s) older than $n months. "+(d.c-d.cu)+" + "+(d.r-d.ru)+" + "+d.or+" = "+(d.ar)+".</li>"
+   + "<li>All defect and day counts are clickable (except Net Add) and will cause JIRA to run the associated JQL query to display the defects in the Issue Navigator.</li>"
+   + "<li>The age cutoff of $n months is a configurable value.</li>"
+   + "<li>The plotted curve that forms the upper boundary of the top green area is actually the same as the red sparkline for Created in the section above, just drawn at a different scale and interpolated instead of straight. The two colored areas above the x-axis are simply the breakdown of the total represented by the red Created sparkline.</li>"
+   + "<li>Avg Days: includes all defects of any age resolved in that month. If no defects were resolved in that month, we use '-'. If all defects were resolved on the same day they were created, the average is '0'. This average can be low if the team leaves old defects unresolved. It can also be low if the team habitually resolves defects quickly and there are no old defects to resolve. Therefore accurate interpretation of this number must take into account the rest of the visualization. A high or low value for Avg Days is not necessarily good or bad.</li>"
+   + "<li>The date and time for the creation of the chart is stamped at the bottom. If you recreate this chart on some later date, certain values will be different especially if there are still unresolved defects.</li>"
+   + "</ul>";
+}
+//------------------------------------------------------------------------
+function createChart(data,w,h,trendHeight,title,svgSelector,averageAdd,latestUrl) {
+var div = d3.select("body").append("div")
+    .attr("class", "tooltip");
+
+  var backgroundColorWhite = "white";
+  ////////////////////////////////////////////////////////////
+  // figure out narrow vs medium vs wide by legend width
+  ////////////////////////////////////////////////////////////
+  var iconSize = 13;
+  var legendTextPadding = 3;
+  var legendWidthOfHourglasses=80;
+  var longestTextFirstColumn  = "Defects created and resolved in M";
+  var longestTextSecondColumn = "Not resolved in M. Created 1-$n" + "M prior";
+  var legendWidthOfOneColumn  = iconSize + 8*legendTextPadding + jQuery.fn.textWidth(longestTextFirstColumn);
+  var legendWidthOfSecondColumn = iconSize + 3*legendTextPadding + jQuery.fn.textWidth(longestTextSecondColumn);
+  var legendWidthOfTwoColumns = legendWidthOfOneColumn + legendWidthOfSecondColumn; 
+  var legendWidthOfThreeColumns = legendWidthOfTwoColumns + legendWidthOfHourglasses;
+  var vnarrow = w < legendWidthOfSecondColumn + legendWidthOfHourglasses;
+  var narrow = legendWidthOfSecondColumn + legendWidthOfHourglasses <= w && w < legendWidthOfTwoColumns;
+  var medium = legendWidthOfTwoColumns <= w && w < legendWidthOfThreeColumns;
+  var wide = w >= legendWidthOfThreeColumns;
+
+  var dotRadius = 2.5;
+  var warnColor = "darkred";//"#B88A00";// see also css resolvedLine
+  var badColor = "#FF6666";// see also css createdLine
+  var resolvedTextColor = "green";
+
+  var colorCR = '#D8E4AA';
+  var colorRR = '#79C36A';
+  var colorCU = '#FFCC99';  
+  var colorRU = '#f9a65a';
+  var colorOR = '#008C47';
+  var colorOU = '#FF8000';  
+  
+  var backgroundRegionOpacity = 1;//0.75;
+  var leftMarginForText = 5;
+  var regressionDash = "12, 2";
+  var lineDash = "3.5, 2";
+  var leftLabelX = 0;//-margin.left+leftMarginForText
+  var shiftUp = -7;
+  var tooltip = 0.6; // helps tooltips take two lines
+  var tooltipFont = "12px sans-serif"; // for computing the width of a tooltip
+  
+  var lr = linearRegression.get(
+			data,
+			function(datum) { return datum.add; },
+			lastMonthPercentDone);
+  linearRegression.updateDataWithIt(data,lr);
+  var bottomMargin = wide ? 150 : medium ? 160 : narrow ? 200 : 262;
+  var lineHeight = 10,
+      margin = {top: 45, right: 20, bottom: bottomMargin, left: 58, trend: trendHeight, legend: 4*lineHeight},
+      width  = w - margin.left - margin.right,
+      height = h - margin.top - margin.bottom - (2*margin.trend) - (2*lineHeight) - margin.legend;
+  var rangePadding = 0.00; // padding between bars
+  var x = d3.scale.ordinal().rangeRoundBands([0, width], rangePadding);
+
+  var y = d3.scale.linear()
+    .rangeRound([height, 0]);
+    
+  var linearRegressionOpacity = 1;//0.60;
+    
+  var r2 = isNaN(lr.r2) ? 1 : lr.r2.toFixed(2);
+  var m  = lr.slope.toFixed(1);
+  var m_msg = "default";
+  var trendColor = "black";
+  if (m>0) {
+   m_msg = "+" + m;
+   trendColor = "red";
+  } else if (m<0) {
+   m_msg = m;
+   trendColor = "green";
+  } else {
+   m_msg = "No change ";
+   trendColor = "green";
+  }
+
+  //////////////////////////////////
+  // axes
+  //////////////////////////////////
+  var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("top")
+    .tickFormat(function(d) {
+      var date = parseDate(d);
+      return "Jan" == formatMonth(date)
+        ? formatYear(date)
+        : formatMonth(date);
+    });
+
+  var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickFormat(function(d){return Math.abs(d);});
+
+  var svg = d3.select(svgSelector)
+    .style("width", width + margin.left + margin.right)
+    .style("height", height + margin.top + margin.bottom + margin.trend + margin.legend)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + (2*margin.trend) + ")");
+
+  x.domain(data.map(function(d) { return d.month; }));
+
+  // figure out y-scale, leaving room for labels below min point and above max point
+  var dmin = d3.min(data, function(d) { return -d.r; });
+  var dmax = d3.max(data, function(d) { return d.c; });
+  var reservepx = 4*lineHeight;
+  var conv = (height - reservepx)/(dmax-dmin);
+  var label = reservepx / conv; 
+  y.domain([dmin-label,dmax+label]);
+  var half = x.rangeBand() / 2;
+
+  // figure out y-scale for net add sparkline, leaving room for labels below min point and above max point
+  var dmin2 = d3.min(data, function(d) { return Math.min(d.add,d.regression); });
+  var dmax2 = d3.max(data, function(d) { return Math.max(d.add,d.regression); });
+  var conv2 = (trendHeight - reservepx)/(dmax2-dmin2);
+  var label2 = reservepx / conv2; 
+  var trendy = d3.scale.linear()
+	  .domain([dmin2-label2,dmax2+label2])
+      .range([margin.trend,0]);
+
+  // figure out y-scale for created vs resolved chart, leaving room for labels below min point and above max point
+  // created = d.c
+  // resolved current = d.c-d.cu
+  // resolved recent = d.r-d.ru
+  // resolved old = d.or 
+  var dmin3 = d3.min(data, function(d) { return Math.min(d.c,d.ar); });
+  var dmax3 = d3.max(data, function(d) { return Math.max(d.c,d.ar); });
+  var conv3 = (trendHeight - reservepx)/(dmax3-dmin3);
+  var label3 = reservepx / conv3; 
+  var cVsRy = d3.scale.linear()
+	  .domain([dmin3-label3,dmax3+label3])
+      .range([margin.trend,0]);
+
+  /////////////////////////////////////
+  // separators
+  /////////////////////////////////////
+  var regionSeparatorColor = "lightgray";
+  svg.append("line") // top separator 
+   .attr("x1", -margin.left)
+   .attr("y1", -2*margin.trend)
+   .attr("x2", width + margin.left )
+   .attr("y2", -2*margin.trend)
+   .attr("class", "separator");
+  svg.append("line") // separator between net add and created v resolved
+   .attr("x1", -margin.left)
+   .attr("y1", -margin.trend)
+   .attr("x2", width + margin.left )
+   .attr("y2", -margin.trend)
+   .attr("class", "separator");
+  svg.append("line") // separator above months
+   .attr("x1", -margin.left)
+   .attr("y1", -2*lineHeight)
+   .attr("x2", width + margin.left )
+   .attr("y2", -2*lineHeight)
+   .attr("class", "separator");
+  svg.append("line") // separator above current
+   .attr("x1", -margin.left)
+   .attr("y1", 0)
+   .attr("x2", width + margin.left )
+   .attr("y2", 0)
+   .attr("class", "separator");
+  svg.append("line") // separator betw. current & recent
+   .attr("x1", -margin.left)
+   .attr("y1", y(0))
+   .attr("x2", width + margin.left )
+   .attr("y2", y(0))
+   .attr("class", "separator");
+
+  /////////////////////////////////////
+  // years in margins when appropriate
+  /////////////////////////////////////
+  var yearY = -lineHeight-1;
+  // year on the left if first month is not january
+  //if (formatMonth(parseDate(data[0].month)) != "Jan") {
+    svg.append("text")
+      .attr("x", 0)
+      .attr("y", yearY)
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .style("text-anchor", "end")
+      .style("fill", "black")
+      .text("Month (M)");
+      //.text(formatYear(parseDate(data[0].month)));
+  //}
+  // year on the right if last month is not january and if it's not the same as the year on the left
+  if (formatMonth(parseDate(data[data.length-1].month)) != "Jan" /*
+      && formatYear(parseDate(data[0].month)) != formatYear(parseDate(data[data.length-1].month)) */) {
+    svg.append("text")
+      .attr("x", width+margin.right)
+      .attr("y", yearY)
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .style("text-anchor", "end")
+      .style("fill", "black")
+      .text(formatYear(parseDate(data[data.length-1].month)));
+  }      
+
+////////////////////////////////////////////////////////////////////////////////
+  svg.datum(data);
+  var interp = "monotone";
+  //var interp = "none";
+  var opacity = 1;//0.3;
+  
+////////////////////////////////////////////////////////////////////////////////
+// grid lines for main chart
+////////////////////////////////////////////////////////////////////////////////
+var numberOfTicks = 6;
+
+var yAxisGrid = d3.svg.axis().scale(y)
+  .ticks(numberOfTicks) 
+  .tickSize(width, 0)
+  .tickFormat("")
+  .orient("right");
+
+var xAxisGrid = d3.svg.axis().scale(x)
+  .ticks(numberOfTicks) 
+  .tickSize(-height, 0)
+  .tickFormat("")
+  .orient("top");
+svg.append("g")
+  .classed('x', true)
+  //.classed('axis', true)
+  .classed('grid tick', true)
+  .call(xAxisGrid);
+
+  // x axis label - months
+  svg.append("g")
+      .attr("class", "x axis")
+      .call(xAxis)
+        .selectAll("text")  
+        .data(data)
+        .style("font-size", fontSize)
+		.attr("dx", "-.8em")
+		.attr("dy", ".15em")
+		.attr("transform", function(d) {
+			return "translate(7,0)" 
+		})
+		.on("click", function(d) {
+            div.transition()        
+                .duration(500)      
+                .style("opacity", 0);   
+			output = getMonthSummary(d,title);
+			window.open().document.write(output);
+        })          
+		.on("mouseover", function(d) {      
+            div.transition()        
+                .duration(200)      
+                .style("opacity", .9);      
+            div .html("Click for summary window")  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px")
+                .style("width", jQuery.fn.textWidth("Click for summary window",tooltipFont)*tooltip + "px");    
+            })                  
+        .on("mouseout", function(d) {       
+            div.transition()        
+                .duration(500)      
+                .style("opacity", 0);   
+        });
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis);
+
+  //////////////////////////////////
+  // clear grid lines behind values
+  //////////////////////////////////
+  var shiftForClearingGridLines = -0.5*lineHeight;
+  svg.selectAll(".clearCC")
+      .data(data)
+      .enter().append("rect") // remove gray grid line
+      .attr("x", function(d) { return x(d.month)+1; })
+      .attr("y", function(d) {
+       return getYforCurrentResolved(d,y,lineHeight,shiftUp)+shiftForClearingGridLines; })
+      .attr("width", 2*half-2)
+      .attr("height", lineHeight)
+      .attr("fill", backgroundColorWhite);
+  svg.selectAll(".clearCU")
+      .data(data)
+      .enter().append("rect") // remove gray grid line
+      .attr("x", function(d) { return x(d.month)+1; })
+      .attr("y", function(d) {
+       return getYforCurrentUnresolved(d,y,lineHeight,shiftUp)+shiftForClearingGridLines; })
+      .attr("width", 2*half-2)
+      .attr("height", lineHeight)
+      .style("fill", backgroundColorWhite);
+  svg.selectAll(".clearRU")
+      .data(data)
+      .enter().append("rect") // remove gray grid line
+      .attr("x", function(d) { return x(d.month)+1; })
+      .attr("y", function(d) {
+       return getYforRecentUnresolved(d,y,lineHeight,shiftUp)+shiftForClearingGridLines; })
+      .attr("width", 2*half-2)
+      .attr("height", lineHeight)
+      .style("fill", backgroundColorWhite);
+  svg.selectAll(".clearRR")
+      .data(data)
+      .enter().append("rect") // remove gray grid line
+      .attr("x", function(d) { return x(d.month)+1; })
+      .attr("y", function(d) {
+       return getYforRecentResolved(d,y,lineHeight,shiftUp)+shiftForClearingGridLines; })
+      .attr("width", 2*half-2)
+      .attr("height", lineHeight)
+      .style("fill", backgroundColorWhite);
+      
+  ////////////////////////////
+  // bars
+  ////////////////////////////
+  if (lastMonthPercentDone < 1.0) {
+   var dd = data[data.length-1];
+   var xx = x(dd.month) + 1;
+   var xx2 = x(dd.month) + 2;
+   var ww = x.rangeBand()-2;
+   var ww2 = x.rangeBand()-4;
+   svg.append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", dd.crU) 
+      .append("rect") 
+      .attr("x", xx)
+      .attr("y", y(dd.c))
+      .attr("width", ww)
+      .attr("height", y(dd.cu)-y(dd.c))
+      .style("fill", colorCR);
+   svg.append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", dd.crU) 
+      .append("rect") 
+      .attr("x", xx2)
+      .attr("y", y(dd.c)+1)
+      .attr("width", ww2)
+      .attr("height", Math.max(y(dd.cu)-y(dd.c)-1,0))
+      .style("fill", backgroundColorWhite);
+      
+   svg.append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", dd.cuU) 
+      .append("rect") 
+      .attr("x", xx)
+      .attr("y", y(dd.cu))
+      .attr("width", ww)
+      .attr("height", y(0)-y(dd.cu))
+      .style("fill", colorCU);
+   svg.append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", dd.cuU) 
+      .append("rect") 
+      .attr("x", xx2)
+      .attr("y", y(dd.cu)+1)
+      .attr("width", ww2)
+      .attr("height", y(0)-y(dd.cu)-1)
+      .style("fill", backgroundColorWhite);
+
+   svg.append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", dd.ruU) 
+      .append("rect") 
+      .attr("x", xx)
+      .attr("y", y(0))
+      .attr("width", ww)
+      .attr("height", y(-dd.ru)-y(0))
+      .style("fill", colorRU);
+   svg.append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", dd.ruU) 
+      .append("rect") 
+      .attr("x", xx2)
+      .attr("y", y(0))
+      .attr("width", ww2)
+      .attr("height", y(-dd.ru)-y(0)-1)
+      .style("fill", backgroundColorWhite);
+      
+   svg.append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", dd.rrU) 
+      .append("rect") 
+      .attr("x", xx)
+      .attr("y", y(-dd.ru))
+      .attr("width", ww)
+      .attr("height", y(-dd.r)-y(-dd.ru))
+      .style("fill", colorRR);
+   svg.append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", dd.rrU) 
+      .append("rect") 
+      .attr("x", xx2)
+      .attr("y", y(-dd.ru))
+      .attr("width", ww2)
+      .attr("height", Math.max(y(-dd.r)-y(-dd.ru)-1,0))
+      .style("fill", backgroundColorWhite);
+  }
+  
+  svg.selectAll(".barcu")
+      .data(data)
+      .enter().append("g")
+      .attr("transform", function(d) { return transformForBar(d,x); })
+      .append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", function(d){return d.cuU;}) 
+      .append("rect") 
+      .attr("x", 0)
+      .attr("y", function(d) { return y(d.cu); })
+      .attr("width", function(d) { return getWidthForBar(d,data,x,half); })
+      .attr("height", function(d) { return y(0)-y(d.cu); })
+      .style("fill", colorCU); 
+  svg.selectAll(".barc")
+      .data(data)
+      .enter().append("g")
+      .attr("transform", function(d) { return transformForBar(d,x); })
+      .append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", function(d){return d.cU;}) 
+      .append("rect") 
+      .attr("x", 0)
+      .attr("y", function(d) { return y(d.c); })
+      .attr("width", function(d) { return getWidthForBar(d,data,x,half); })
+      .attr("height", function(d) { return y(d.cu)-y(d.c); })
+      .style("fill", colorCR); 
+  svg.selectAll(".barru")
+      .data(data)
+      .enter().append("g")
+      .attr("transform", function(d) { return transformForBar(d,x); })
+      .append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", function(d){return d.ruU;})  
+      .append("rect") 
+      .attr("x", 0)
+      .attr("y", function(d) { return y(0); })
+      .attr("width", function(d) { return getWidthForBar(d,data,x,half); })
+      .attr("height", function(d) { 
+       	return d.ru==d.r ? y(0)-y(d.ru) : y(0)-y(d.ru)+1;
+      })
+      .style("fill", colorRU); 
+  svg.selectAll(".barr")
+      .data(data)
+      .enter().append("g")
+      .attr("transform", function(d) { return transformForBar(d,x); })
+      .append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", function(d){return d.rU;})  
+      .append("rect") 
+      .attr("x", 0)
+      .attr("y", function(d) { return y(-d.ru); })
+      .attr("width", function(d) { return getWidthForBar(d,data,x,half); })
+      .attr("height", function(d) { return y(d.ru)-y(d.r); })
+      .style("fill", colorRR);
+  ////////////////////////////
+  // x axis
+  ////////////////////////////
+  svg.append("rect") 
+      .attr("x", 0)
+      .attr("y", function(d) { return y(0)-0.5; })
+      .attr("width", width)
+      .attr("height", 1)
+      .style("fill", "black");
+  var gridColor = "CCCCCC";
+  // values : created and resolved (thickness of top green area)
+  svg.selectAll(".c")
+      .data(data)
+      .enter()
+      .append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", function(d){return d.crU;})
+      .append("text")
+      .attr("x", function(d) { return x(d.month) + half; })
+      .attr("y", function(d) { return getYforCurrentResolved(d,y,lineHeight,shiftUp); })
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .attr("text-anchor", "middle")
+      .style("fill", resolvedTextColor)
+      .text(function(d) { return d.c-d.cu; });
+
+  // values : created unresovled
+  svg.selectAll(".cu")
+      .data(data)
+      .enter()
+      .append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", function(d){return d.cuU;})
+      .append("text")
+      .attr("x", function(d) { return x(d.month) + half; })
+      .attr("y", function(d) { return getYforCurrentUnresolved(d,y,lineHeight,shiftUp); })
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .attr("text-anchor", "middle")
+      .style("fill", "black")
+      .text(function(d) { return d.cu; });
+  // values : recent unresolved 
+  svg.selectAll(".ru")
+      .data(data)
+      .enter()
+      .append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", function(d){return d.ruU;})
+      .append("text")
+      .attr("x", function(d) { return x(d.month) + half; })
+      .attr("y", function(d) { return getYforRecentUnresolved(d,y,lineHeight,shiftUp); })
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .attr("text-anchor", "middle")
+      .style("fill", "black")
+      .text(function(d) { return d.ru; });
+  // values : recent resolved - thickness of lower green area
+  svg.selectAll(".r")
+      .data(data)
+      .enter()
+      .append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", function(d){return d.rrU;})
+      .append("text")
+      .attr("x", function(d) { return x(d.month) + half; })
+      .attr("y", function(d) { return getYforRecentResolved(d,y,lineHeight,shiftUp); })
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .attr("text-anchor", "middle")
+      .style("fill", resolvedTextColor)
+      .text(function(d) { return d.r-d.ru; });
+  // values : total created current
+  svg.append("rect") // remove gray grid line
+      .attr("x", function(d) { return x(d.month)+1; })
+      .attr("y", y(dmax)  + 3.2*shiftUp)
+      .attr("width", width-2)
+      .attr("height", lineHeight)
+      .style("fill", backgroundColorWhite)
+  svg.selectAll(".tc")
+      .data(data)
+      .enter()
+      .append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", function(d){return d.cU;})
+      .append("text")
+      .attr("x", function(d) { return x(d.month) + half; })
+      .attr("y", function(d) {
+       return y(dmax)  + 2.5*shiftUp;
+      })
+      .style("font-weight", "bold")
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .attr("text-anchor", "middle")
+      .style("fill", "darkred")
+      .text(function(d) { return d.c; });
+  // values : total recent
+  svg.append("rect") // remove gray grid line
+      .attr("x", function(d) { return x(d.month)+1; })
+      .attr("y", y(dmin) - 1.8*shiftUp)
+      .attr("width", width-2)
+      .attr("height", lineHeight)
+      .style("fill", backgroundColorWhite)
+  svg.selectAll(".tr")
+      .data(data)
+      .enter()
+      .append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", function(d){return d.rU;})
+      .append("text")
+      .attr("x", function(d) { return x(d.month) + half; })
+      .attr("y", function(d) {
+       return y(dmin) - 2.5*shiftUp;
+      })
+      .style("font-weight", "bold")
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .attr("text-anchor", "middle")
+      .style("fill", "black")
+      .text(function(d) { return d.r; });
+
+  var spark = d3.select(svgSelector)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + 0 + ")");
+////////////////////////////////////////////////////////////////////////////////
+  // regression line
+////////////////////////////////////////////////////////////////////////////////
+  var regressionLine = d3.svg.line()
+       .x(function(d) { return x(d.month) + half; })
+       .y(function(d) { return trendy(d.regression); });
+  spark.append("path")
+       .datum(data)
+       .attr("class","regressionLine")
+       .attr("opacity", 0.4)
+       .style("stroke", trendColor)//"555555")// "BBBBBB")
+       .style("stroke-dasharray", (regressionDash)) 
+       .attr("d",regressionLine);
+
+  // sparkline for net add
+  var line = d3.svg.line()
+    //.interpolate(interp)
+    .x(function(d) { return getXforDataPointSparkline(d,data,x,half); })
+    .y(function(d) { return trendy(d.add); });
+  
+  spark.append("path")
+       .datum(data)
+       .attr("class","line")
+       .attr("d",line);      
+
+  var topLegendHeight = 40;
+  var topLegend_yShift = 30;
+  var behind_y1 = - trendHeight - (2*topLegend_yShift);
+
+  // spark values
+  var trend = spark.selectAll(".trend")
+      .data(data)
+      .enter().append("g")
+      .attr("class", "trend")
+      .attr("transform", function(d) { return "translate(" + (x(d.month)+half) + "," + 0 + ")"; });
+  trend.append("text")
+      .attr("x", 0)
+      .attr("y", function(d) {
+      	return d.add >= 0 //d.regression 
+      		? trendy(d.add) + shiftUp 
+      		: trendy(d.add) - shiftUp;
+      })
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .attr("text-anchor", "middle")
+      .text(function(d) { return d.add; });
+
+////////////////////////////////////////////////////////////////////////////////
+// created vs resolved 
+////////////////////////////////////////////////////////////////////////////////
+
+  var cVsR = d3.select(svgSelector)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + (margin.trend-0.25*reservepx) + ")");
+
+  // created line
+  var createdLine = d3.svg.line()
+    .x(function(d) { return getXforDataPointSparkline(d,data,x,half); })
+    .y(function(d) { return cVsRy(d.c); });
+  cVsR.append("path")
+       .datum(data)
+       .attr("class","createdLine")
+       .attr("d",createdLine);
+             
+  // resolved line
+  var createdLine = d3.svg.line()
+    .x(function(d) { return getXforDataPointSparkline(d,data,x,half); })
+    .y(function(d) { return cVsRy(d.ar); });
+  cVsR.append("path")
+       .datum(data)
+       .attr("class","resolvedLine")
+       .attr("d",createdLine);
+
+  // created values
+  var createdValues = cVsR.selectAll(".createdValues")
+      .data(data)
+      .enter().append("g")
+      .attr("class", "createdValues")
+      .attr("transform", function(d) { return "translate(" + (x(d.month)+half) + ",0)"; });
+  createdValues.append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", function(d) { return d.cU; } )
+      .append("text")
+      .attr("x", 0)
+      .attr("y", function(d) {
+      	return d.c > d.ar
+      		? cVsRy(d.c) + shiftUp 
+      		: cVsRy(d.c) - shiftUp;
+      })
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .style("fill", "darkred")
+      .attr("text-anchor", "middle")
+      .text(function(d) { return d.c; });
+
+  // resolved values
+  var resolvedValues = cVsR.selectAll(".resolvedValues")
+      .data(data)
+      .enter().append("g")
+      .attr("class", "resolvedValues")
+      .attr("transform", function(d) { return "translate(" + (x(d.month)+half) + ",0)"; });
+  resolvedValues.append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", function(d) { return d.arU; } )
+      .append("text")
+      .attr("x", 0)
+      .attr("y", function(d) {
+      	return d.c > d.ar
+      		? cVsRy(d.ar) - shiftUp 
+      		: cVsRy(d.ar) + shiftUp;
+      })
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .style("fill", resolvedTextColor)
+      .attr("text-anchor", "middle")
+      .text(function(d) { return d.ar; });
+               
+  //////////////////////////////////
+  // old defects
+  //////////////////////////////////
+  var drop = 0;
+  var old = d3.select(svgSelector)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + (margin.top+margin.trend+height + 5.7*lineHeight) + ")");
+  old.append("rect")
+      .attr("x", -margin.left)
+      .attr("y", -lineHeight)
+      .attr("opacity", backgroundRegionOpacity)
+      .attr("width", width+margin.left+margin.right)
+      .attr("height", 3.5*lineHeight)
+      .style("fill", backgroundColorWhite);
+if (lastMonthPercentDone < 1.0) {
+if (dd.or > 0) {
+old.append("rect")
+      .attr("x", x(dd.month)+1)
+      .attr("y", -0.95*lineHeight)
+      .attr("width", x.rangeBand()-1)
+      .attr("height", 1.65*lineHeight)
+      .style("fill", colorOR);
+old.append("rect")
+      .attr("x", x(dd.month)+1)
+      .attr("y", -0.95*lineHeight+1)
+      .attr("width", x.rangeBand()-2)
+      .attr("height", 1.65*lineHeight-2)
+      .style("fill", backgroundColorWhite);
+}
+if (dd.ou > 0) {
+old.append("rect")
+      .attr("x", x(dd.month)+1)
+      .attr("y", 0.8*lineHeight)
+      .attr("width", x.rangeBand()-1)
+      .attr("height", 1.65*lineHeight)
+      .style("fill", colorOU);
+old.append("rect")
+      .attr("x", x(dd.month)+1)
+      .attr("y", 0.8*lineHeight+1)
+      .attr("width", x.rangeBand()-2)
+      .attr("height", 1.65*lineHeight-2)
+      .style("fill", backgroundColorWhite);
+}
+}      
+  var or = old.selectAll(".or")
+      .data(data)
+      .enter().append("g")
+      .attr("transform", function(d) { return "translate(" + x(d.month) + "," + (-1) + ")"; });
+  or.append("rect") // background for interesting values
+      .attr("x", 1)
+      .attr("y", -0.85*lineHeight)
+      .attr("width", function(d) { return getWidthForBar(d,data,x,half); })
+      .attr("height", 1.65*lineHeight)
+      .style("fill", function(d) { return d.or > 0 ? colorOR : backgroundColorWhite; });
+  var orPartial = lastMonthPercentDone < 1.0 && dd.or > 0 ;
+  or.append("rect") // white background for number in partial month
+      .attr("x", function(d) { return orPartial && d.month==data[data.length-1].month ? half - ((jQuery.fn.textWidth(""+d.or)+3)/2.0) : 0; })
+      .attr("y", -0.5*lineHeight)
+      .attr("width", function(d) { return orPartial && d.month==data[data.length-1].month ? jQuery.fn.textWidth(""+d.or)+3 : 0; })
+      .attr("height", lineHeight)
+      .style("fill", backgroundColorWhite);
+
+  or.append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", function(d) { return d.orU; } )
+      .append("text")
+      .attr("x", half)
+      .attr("y", 0)
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .style("fill", function(d) {
+        return d.or > 0 
+          ? d.month==data[data.length-1].month && lastMonthPercentDone < 1.0
+            ? resolvedTextColor : backgroundColorWhite 
+          : resolvedTextColor; 
+      })
+      .style("fill-opacity", "1")
+      .attr("text-anchor", "middle")
+      .text(function(d) { return d.or; });
+  
+  var oldText = ">" + $n + "M ";
+  old.append("text")
+      .attr("x", leftLabelX)
+      .style("text-anchor", "end")
+      .attr("y", 0)
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .text(oldText + "Res")
+      .on("mouseover", function(d) {      
+            div.transition()        
+                .duration(200)      
+                .style("opacity", .9);      
+            div .html("Count of defects which were older than "+$n+" months at the time which were resolved during that month.")  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px")
+                .style("width", jQuery.fn.textWidth("Count of defects which were older than "+$n+" months at the time which were resolved during that month.",tooltipFont)*tooltip + "px");    
+            })                  
+        .on("mouseout", function(d) {       
+            div.transition()        
+                .duration(500)      
+                .style("opacity", 0);   
+        });
+
+  var old2ndLine = 1.65*lineHeight;
+  var ou = old.selectAll(".ou")
+      .data(data)
+      .enter().append("g")
+      .attr("class", "ou")
+      .attr("transform", function(d) { return "translate(" + (x(d.month)+1) + "," + old2ndLine + ")"; });
+  ou.append("rect") // background for interesting values
+      .attr("x", 0)
+      .attr("y", -0.85*lineHeight)
+      .attr("width", function(d) { return getWidthForBar(d,data,x,half); })
+      .attr("height", 1.7*lineHeight)
+      .style("fill", function(d) { return d.ou > 0 ? colorOU : backgroundColorWhite; }); 
+  var ouPartial = lastMonthPercentDone < 1.0 && dd.ou > 0 ;
+  ou.append("rect") // white background for number in partial month
+      .attr("x", function(d) { return ouPartial && d.month==data[data.length-1].month ? half - ((jQuery.fn.textWidth(""+d.ou)+3)/2.0) : 0; })
+      .attr("y", -0.5*lineHeight)
+      .attr("width", function(d) { return ouPartial && d.month==data[data.length-1].month ? jQuery.fn.textWidth(""+d.ou)+3 : 0; })
+      .attr("height", lineHeight)
+      .style("fill", backgroundColorWhite);
+  ou.append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", function(d) { return d.ouU; } )
+      .append("text")
+      .attr("x", half-0.5)
+      .attr("y", 0)
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .style("fill", function(d) {
+        return d.ou > 0 
+          ? d.month==data[data.length-1].month && lastMonthPercentDone < 1.0  
+          	? "black" : backgroundColorWhite 
+          : "black";
+      })
+      .attr("text-anchor", "middle")
+      .text(function(d) { return d.ou; });
+  old.append("text")
+      .attr("x", leftLabelX)
+      .style("text-anchor", "end")
+      .attr("y", old2ndLine)
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .text(oldText + "Unr")
+      .on("mouseover", function(d) {      
+            div.transition()        
+                .duration(200)      
+                .style("opacity", .9);      
+            div .html("Count of defects which were older than "+$n+" months at the time which remain unresolved as of today.")  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px")
+                .style("width", jQuery.fn.textWidth("Count of defects which were older than "+$n+" months at the time which remain unresolved as of today.",tooltipFont)*tooltip + "px");    
+            })                  
+        .on("mouseout", function(d) {       
+            div.transition()        
+                .duration(500)      
+                .style("opacity", 0);   
+        });
+  var strokewidth = 1;
+  old.append("line") // separator betw. recent & old
+   .attr("x1", -margin.left)
+   .attr("y1", -lineHeight)
+   .attr("x2", width + margin.left )
+   .attr("y2", -lineHeight)
+   .attr("stroke-width", strokewidth)
+   .attr("stroke", regionSeparatorColor);
+  old.append("line") // separator below old
+   .attr("x1", -margin.left)
+   .attr("y1", 2.5*lineHeight)
+   .attr("x2", width + margin.left )
+   .attr("y2", 2.5*lineHeight)
+   .attr("stroke-width", strokewidth)
+   .attr("stroke", regionSeparatorColor);
+/////////////////////////////////////
+// box around legend
+/////////////////////////////////////
+  old.append("rect")
+     .attr("x", -margin.left)
+     .attr("y", 4.5*lineHeight)
+     .attr("width", width+margin.left+margin.right)
+     .attr("height", wide ? 68 : medium ? 82 : narrow ? 125 : 185)
+     .style("fill", backgroundColorWhite)
+     .style("stroke", regionSeparatorColor);
+  // Avg Days defects resolved during that month had been unresolved.
+  var avDaysY = 3.5*lineHeight;
+  old.append("text")
+      .attr("x", leftLabelX)
+      .style("text-anchor", "end")
+      .attr("y", avDaysY)
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .text("Avg Days")
+      .on("mouseover", function(d) {      
+            div.transition()        
+                .duration(200)      
+                .style("opacity", .9);      
+            div .html("Average number of days it took to resolve tickets created at any time and resolved during a given month.")  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px")
+                .style("width", jQuery.fn.textWidth("Average number of days it took to resolve tickets created at any time and resolved during a given month.",tooltipFont)*tooltip + "px");    
+            })                  
+        .on("mouseout", function(d) {       
+            div.transition()        
+                .duration(500)      
+                .style("opacity", 0);   
+        });
+  var avDays = old.selectAll(".avDays")
+      .data(data)
+      .enter().append("g")
+      .attr("class", "avDays")
+      .attr("transform", function(d) { return "translate(" + (x(d.month)+half) + "," + avDaysY + ")"; });
+  avDays.append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", function(d) { return d.arU; } )
+      .append("text")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .attr("text-anchor", "middle")
+      .text(function(d) { return d.ad; });
+
+  var hourglassColor = "555555";
+  var hourglassX = width;
+  var hourglassScale = 0.7;
+  /////////////////////////
+  // current hourglass
+  /////////////////////////
+  var currentHourglassYhi = y(0)/2 - lineHeight;
+  var currentHourglassYlo = yearY + lineHeight;
+  
+  var currentHourglassY =  currentHourglassYhi < (yearY + 0.5*lineHeight) ? currentHourglassYlo : currentHourglassYhi;  
+  var currentHourglass = svg.append("g")
+     .attr("transform", function(d) {
+       return "translate("+hourglassX+","+currentHourglassY+")" 
+	 })
+  currentHourglass.append("path")
+     .style("fill", hourglassColor)
+     .attr("d", "M10.512,14.465c0,0-3.516-3.422-4.887-7.355V6.039h11.168V7.11c-1.782,4.343-4.887,7.355-4.887,7.355H10.512z")
+     .attr("transform", function(d) { return "scale("+hourglassScale+")" });
+  currentHourglass.append("path")
+     .style("fill", hourglassColor)
+     .attr("d", "M20.819,4.907V3.219h1.602V0H0v3.219h1.6v1.688c0,2.579,4.628,9.622,4.848,10.13C6.232,15.545,1.6,22.588,1.6,25.156v1.687	H0v3.223h22.42v-3.223h-1.602v-1.687c0-2.581-4.631-9.577-4.875-10.125C16.188,14.485,20.819,7.486,20.819,4.907z M19.217,25.156 v1.687H3.201v-1.687c0-1.853,4.907-9.195,4.907-10.125c0-0.929-4.907-8.269-4.907-10.124V3.219h16.016v1.688 c0,1.855-4.948,9.195-4.948,10.124C14.27,15.961,19.217,23.303,19.217,25.156z")
+     .attr("transform", function(d) { return "scale("+hourglassScale+")" });
+  currentHourglass.append("text")
+      .append("text")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .attr("text-anchor", "middle")
+      .attr("opacity", 0)
+      .text("Icon made by http://www.freepik.com from www.flaticon.com/free-icon/hourglass_919 etc");
+  /////////////////////////
+  // recent hourglass
+  /////////////////////////
+  var recentHourglass = svg.append("g")
+     .attr("transform", function(d) {
+       return "translate("+hourglassX+","+(height-((height-y(0))/2) - lineHeight)+")" 
+	 })
+  recentHourglass.append("path")
+     .style("fill", hourglassColor)
+     .attr("d", "M16.795,6.649V5.712H5.629v0.937c0,0,1.697,4.73,4.885,6.914v2.272c0,0-3.516,3.422-4.885,7.354v1.072h11.166v-1.072 c-1.782-4.341-4.887-7.354-4.887-7.354v-2.272C16.243,9.838,16.795,6.649,16.795,6.649z")
+     .attr("transform", function(d) { return "scale("+hourglassScale+")" });
+  recentHourglass.append("path")
+     .style("fill", hourglassColor)
+     .attr("d", "M20.819,4.907V3.219h1.602V0H0v3.219h1.6v1.688c0,2.579,4.628,9.622,4.848,10.13C6.232,15.545,1.6,22.588,1.6,25.156v1.687	H0v3.223h22.42v-3.223h-1.602v-1.687c0-2.581-4.631-9.577-4.875-10.125C16.188,14.485,20.819,7.486,20.819,4.907z M19.217,25.156 v1.687H3.201v-1.687c0-1.853,4.907-9.195,4.907-10.125c0-0.929-4.907-8.269-4.907-10.124V3.219h16.016v1.688 c0,1.855-4.948,9.195-4.948,10.124C14.27,15.961,19.217,23.303,19.217,25.156z")
+     .attr("transform", function(d) { return "scale("+hourglassScale+")" });
+  /////////////////////////
+  // old hourglass
+  /////////////////////////
+  var oldHourglass = old.append("g")
+     .attr("transform", function(d) {
+			return "translate("+hourglassX+",-5)" 
+	 })
+  oldHourglass.append("path")
+     .style("fill", hourglassColor)
+     .attr("d", "M10.627,16.336c0,0-3.553,3.459-4.939,7.434v1.084h11.289V23.77 c-1.802-4.389-4.939-7.434-4.939-7.434H10.627z")
+     .attr("transform", function(d) { return "scale("+hourglassScale+")" });
+  oldHourglass.append("path")
+     .style("fill", hourglassColor)
+     .attr("d", "M21.047,4.963V3.256h1.618V0H0v3.256h1.619v1.707c0,2.605,4.677,9.725,4.898,10.238 c-0.217,0.514-4.898,7.631-4.898,10.229v1.703H0v3.26h22.665v-3.26h-1.618V25.43c0-2.609-4.682-9.68-4.929-10.232	C16.365,14.643,21.047,7.568,21.047,4.963z M19.427,25.43v1.703H3.237V25.43c0-1.875,4.961-9.297,4.961-10.232 c0-0.941-4.961-8.361-4.961-10.234V3.256h16.189v1.707c0,1.873-5,9.293-5,10.234C14.427,16.133,19.427,23.555,19.427,25.43z")
+     .attr("transform", function(d) { return "scale("+hourglassScale+")" });
+ //////////////////////////////////////////////////
+ // legend
+ //////////////////////////////////////////////////
+ lineStrokeWidth = 1.3;
+ var legendLength = 63;
+ var legendLineHeight= 1.5;
+ var legendLineYStart= 4.2;
+ var x1 = leftMarginForText-margin.left;
+ var x2 = 0;
+ var legendTextX = leftMarginForText;
+
+ //////////////////////////////////////////////////
+ // bar chart legend  
+ //////////////////////////////////////////////////
+ var legendY = 50;
+ var legendX = legendTextPadding-margin.left;
+ var rLegend = d3.scale.ordinal()
+    .domain([longestTextFirstColumn,
+             "Resolved in M. Created 1-$n" + "M prior",
+             "Resolved in M. Older than $n" + "M"])
+    .range([colorCR,colorRR,colorOR]);
+ var uLegend = d3.scale.ordinal()
+    .domain(["Not resolved in M. Created in M",
+             longestTextSecondColumn,
+             "Not resolved in M. Older than $n" + "M"])
+    .range([colorCU,colorRU,colorOU]);
+ var rlegend = old.selectAll(".rlegend").data(rLegend.domain().slice())
+      .enter().append("g")
+      .attr("transform", function(d, i) {
+         return "translate(" + legendX + "," + (legendY+i*2*lineHeight) +")"; 
+       }); 
+ rlegend.append("rect")
+      .attr("x", 0)
+      .attr("y", 2)
+      .attr("width", iconSize)
+      .attr("height",iconSize)
+      .style("fill", rLegend);
+ rlegend.append("text")
+      .attr("x", iconSize+legendTextPadding)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .text(function(d) { return d; });
+
+ var ulegend = old.selectAll(".rlegend").data(uLegend.domain().slice())
+      .enter().append("g")
+      .attr("transform", function(d, i) {
+         return narrow || vnarrow
+          ? "translate(" + legendX + "," + (legendY+(3+i)*2*lineHeight) +")"
+          : "translate(" + (-margin.left+iconSize + 8*legendTextPadding + jQuery.fn.textWidth(longestTextFirstColumn)) + "," + (legendY+i*2*lineHeight) +")";
+       });
+ ulegend.append("rect")
+      .attr("x", 0)
+      .attr("y", 2)
+      .attr("width", iconSize)
+      .attr("height",iconSize)
+      .style("fill", uLegend);
+ ulegend.append("text")
+      .attr("x", iconSize + legendTextPadding)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .text(function(d) { return d; });
+
+  //////////////////////////////////
+  // legend
+  //////////////////////////////////
+  lineStrokeWidth = 1.3;
+  var legendLength = 63;
+  var legendLineHeight= 1.5;
+  var legendLineYStart= 4.2;
+  var x1 = leftMarginForText-margin.left;
+  var x2 = 0;
+  var legendTextX = leftMarginForText;
+  /////////////////////////
+  // legend current hourglass
+  /////////////////////////
+  hourglassScale = 0.4;
+  var legendHourglassX = wide || narrow ? w-130 : leftMarginForText-margin.left;
+  var legendHourglassXshift = medium ? $w/3 : 0;
+  var legendHourglassY = wide || narrow ? 5.25 : medium ? 11.2 : 17.25;
+  var legendHourglassHeight = medium ? 0 : 2;
+  var legendHourglassTextX = 15;
+  var legendHourglassTextY = 7;
+  hourglassColor = "333333";
+  var currentHourglass = old.append("g")
+     .attr("transform", function(d) {
+       return "translate("+(legendHourglassX+(0*legendHourglassXshift))+","+legendHourglassY*lineHeight+")" 
+	 })
+  currentHourglass.append("path")
+     .style("fill", hourglassColor)
+     .attr("d", "M10.512,14.465c0,0-3.516-3.422-4.887-7.355V6.039h11.168V7.11c-1.782,4.343-4.887,7.355-4.887,7.355H10.512z")
+     .attr("transform", function(d) { return "scale("+hourglassScale+")" });
+  currentHourglass.append("path")
+     .style("fill", hourglassColor)
+     .attr("d", "M20.819,4.907V3.219h1.602V0H0v3.219h1.6v1.688c0,2.579,4.628,9.622,4.848,10.13C6.232,15.545,1.6,22.588,1.6,25.156v1.687	H0v3.223h22.42v-3.223h-1.602v-1.687c0-2.581-4.631-9.577-4.875-10.125C16.188,14.485,20.819,7.486,20.819,4.907z M19.217,25.156 v1.687H3.201v-1.687c0-1.853,4.907-9.195,4.907-10.125c0-0.929-4.907-8.269-4.907-10.124V3.219h16.016v1.688 c0,1.855-4.948,9.195-4.948,10.124C14.27,15.961,19.217,23.303,19.217,25.156z")
+     .attr("transform", function(d) { return "scale("+hourglassScale+")" });
+  currentHourglass.append("text")
+      .attr("x", legendHourglassTextX)
+      .attr("y", legendHourglassTextY)
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .style("fill", "black")
+      .text("Age < 1 M");
+  /////////////////////////
+  // legend recent hourglass
+  /////////////////////////
+  var recentHourglass = old.append("g")
+     .attr("transform", function(d) {
+       return "translate("+(legendHourglassX+(1*legendHourglassXshift))+","+(legendHourglassY+legendHourglassHeight)*lineHeight+")" 
+	 })
+  recentHourglass.append("path")
+     .style("fill", hourglassColor)
+     .attr("d", "M16.795,6.649V5.712H5.629v0.937c0,0,1.697,4.73,4.885,6.914v2.272c0,0-3.516,3.422-4.885,7.354v1.072h11.166v-1.072 c-1.782-4.341-4.887-7.354-4.887-7.354v-2.272C16.243,9.838,16.795,6.649,16.795,6.649z")
+     .attr("transform", function(d) { return "scale("+hourglassScale+")" });
+  recentHourglass.append("path")
+     .style("fill", hourglassColor)
+     .attr("d", "M20.819,4.907V3.219h1.602V0H0v3.219h1.6v1.688c0,2.579,4.628,9.622,4.848,10.13C6.232,15.545,1.6,22.588,1.6,25.156v1.687	H0v3.223h22.42v-3.223h-1.602v-1.687c0-2.581-4.631-9.577-4.875-10.125C16.188,14.485,20.819,7.486,20.819,4.907z M19.217,25.156 v1.687H3.201v-1.687c0-1.853,4.907-9.195,4.907-10.125c0-0.929-4.907-8.269-4.907-10.124V3.219h16.016v1.688 c0,1.855-4.948,9.195-4.948,10.124C14.27,15.961,19.217,23.303,19.217,25.156z")
+     .attr("transform", function(d) { return "scale("+hourglassScale+")" });
+  recentHourglass.append("text")
+      .attr("x", legendHourglassTextX)
+      .attr("y", legendHourglassTextY)
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .style("fill", "black")
+      .text("Age 1-$n M");
+  /////////////////////////
+  // legend old hourglass
+  /////////////////////////
+  var oldHourglass =  old.append("g")
+     .attr("transform", function(d) {
+       return "translate("+(legendHourglassX+(2*legendHourglassXshift))+","+(legendHourglassY+2*legendHourglassHeight)*lineHeight+")" 
+	 })
+  oldHourglass.append("path")
+     .style("fill", hourglassColor)
+     .attr("d", "M10.627,16.336c0,0-3.553,3.459-4.939,7.434v1.084h11.289V23.77 c-1.802-4.389-4.939-7.434-4.939-7.434H10.627z")
+     .attr("transform", function(d) { return "scale("+hourglassScale+")" });
+  oldHourglass.append("path")
+     .style("fill", hourglassColor)
+     .attr("d", "M21.047,4.963V3.256h1.618V0H0v3.256h1.619v1.707c0,2.605,4.677,9.725,4.898,10.238 c-0.217,0.514-4.898,7.631-4.898,10.229v1.703H0v3.26h22.665v-3.26h-1.618V25.43c0-2.609-4.682-9.68-4.929-10.232	C16.365,14.643,21.047,7.568,21.047,4.963z M19.427,25.43v1.703H3.237V25.43c0-1.875,4.961-9.297,4.961-10.232 c0-0.941-4.961-8.361-4.961-10.234V3.256h16.189v1.707c0,1.873-5,9.293-5,10.234C14.427,16.133,19.427,23.555,19.427,25.43z")
+     .attr("transform", function(d) { return "scale("+hourglassScale+")" });
+  oldHourglass.append("text")
+      .attr("x", legendHourglassTextX)
+      .attr("y", legendHourglassTextY)
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .style("fill", "black")
+      .text("Age > $n M");
+  
+  //////////////////////////////////
+  // rendered date
+  //////////////////////////////////
+  var extraLegendY = wide ? 125 : medium ? 140 : narrow ? 180 : 243;
+  var extraLegend = old.append("g")
+     .attr("transform", function(d) {
+       return "translate(0,"+extraLegendY+")" 
+	 })
+	 /*
+  extraLegend.append("text")
+      .attr("x", 0)
+      .attr("y", 0*lineHeight)
+      .style("font-size", fontSize-2)
+      .style("text-anchor", "end")
+      .style("fill", "black")
+      .text("M TTL");
+  extraLegend.append("text")
+      .attr("x", legendTextX)
+      .attr("y", 0*lineHeight)
+      .style("font-size", fontSize-2)
+      .style("fill", "black")
+      .text("Days before defects created in M were resolved.");
+  extraLegend.append("text")
+      .attr("x", legendTextX)
+      .attr("y", 1.2*lineHeight)
+      .style("font-size", fontSize-2)
+      .style("fill", "black")
+      .text("Excludes defects which still remain unresolved.");
+      */
+  extraLegend
+      .append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", latestUrl)
+      .append("text")
+      .attr("x", leftMarginForText-margin.left)
+      .attr("y", 0)
+      .style("font-size", fontSize-2)
+      .style("fill", "blue")
+      .text("Get latest.")          
+	  .on("mouseover", function(d) {      
+            div.transition()        
+               .duration(200)      
+               .style("opacity", .9);      
+            div.html("Opens new window/tab with the latest data. Also updates cache.")  
+               .style("left", (d3.event.pageX) + "px")     
+               .style("top", (d3.event.pageY - 28) + "px")
+               .style("width", jQuery.fn.textWidth("Opens new window/tab with the latest data. Also updates cache.") + "px");    
+            })                  
+      .on("mouseout", function(d) {       
+            div.transition()        
+                .duration(500)      
+                .style("opacity", 0);   
+      });
+  extraLegend
+	  .append("text")
+      .attr("x", leftMarginForText-margin.left+jQuery.fn.textWidth("Get latest."))
+      .attr("y", 0)
+      .style("font-size", fontSize-2)
+      .style("fill", "gray")
+      .text("Rendered:" + new Date())
+	  .on("mouseover", function(d) {      
+            div.transition()        
+               .duration(200)      
+               .style("opacity", .9);      
+            div.html("When this was rendered. Cached items can be from earlier in the same day.")  
+               .style("left", (d3.event.pageX) + "px")     
+               .style("top", (d3.event.pageY - 28) + "px")
+               .style("width", jQuery.fn.textWidth("When this was rendered. Cached items can be from earlier in the same day.") + "px");    
+            })                  
+      .on("mouseout", function(d) {       
+            div.transition()        
+                .duration(500)      
+                .style("opacity", 0);   
+      });
+  //////////////////////////////////
+  // MoM reference thumbnail
+  //////////////////////////////////
+  var mom = monthOverMonth.draw(
+  				lineHeight,margin,lr,svgSelector,regressionDash,trendColor,m_msg,r2,div,tooltip,tooltipFont,
+  				"Net Add",
+  				"Defects created in a given month minus defects (of any age) resolved in the same month.",
+  				averageAdd);
+  
+  var marginLineHeight = 1.2*lineHeight;
+  var createdVsResolvedTooltip = "Count of all defects created in a given month (red) vs all resolved in the same month (green).";
+  var createdX = 4;
+  var createdY = 1.5*margin.trend-0.25*reservepx-0.6*lineHeight;
+  mom.append("text")
+      .attr("x", 4)
+      .attr("y", createdY)
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .style("fill", "darkred")
+      .text("Created")
+      .on("mouseover", function(d) {
+            div.transition()        
+                .duration(200)      
+                .style("opacity", .9);      
+            div .html(createdVsResolvedTooltip)  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px")
+                .style("width", jQuery.fn.textWidth(createdVsResolvedTooltip,tooltipFont)*tooltip + "px");    
+            })                  
+        .on("mouseout", function(d) {       
+            div.transition()        
+                .duration(500)      
+                .style("opacity", 0);   
+        });
+  mom.append("text")
+      .attr("x", margin.left)
+      .attr("y", createdY)
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .style("text-anchor", "end")
+      .style("fill", "black")
+      .text("vs")
+      .on("mouseover", function(d) {      
+            div.transition()        
+                .duration(200)      
+                .style("opacity", .9);      
+            div .html(createdVsResolvedTooltip)  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px")
+                .style("width", jQuery.fn.textWidth(createdVsResolvedTooltip,tooltipFont)*tooltip + "px");    
+            })                  
+        .on("mouseout", function(d) {       
+            div.transition()        
+                .duration(500)      
+                .style("opacity", 0);   
+        });
+  mom.append("text")
+      .attr("x", margin.left)
+      .attr("y", createdY+marginLineHeight)
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .style("text-anchor", "end")
+      .style("fill", resolvedTextColor)
+      .text("Resolved")
+      .on("mouseover", function(d) {      
+            div.transition()        
+                .duration(200)      
+                .style("opacity", .9);      
+            div .html(createdVsResolvedTooltip)  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px")
+                .style("width", jQuery.fn.textWidth(createdVsResolvedTooltip,tooltipFont)*tooltip + "px");    
+            })                  
+        .on("mouseout", function(d) {       
+            div.transition()        
+                .duration(500)      
+                .style("opacity", 0);   
+        });
+}
+createChart(data,w,h,trendHeight,title,".chart",averageAdd,latestUrl);
+</script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+#if($logoPath)
+    <img id="logoImg" src="$logoPath" />
+#end
+
+<tr>
+    <td class="fieldLabelArea">
+        JQL:
+    </td>
+    <td nowrap>
+        <textarea name="jql" id="jql" rows="3" cols="50">$jql</textarea>
+        <div class="description">Optional - JQL query to determine if mail should be sent</div>
+    </td>
+</tr>
+
+<tr>
+    <td class="fieldLabelArea required"><sup style="color:red">*</sup>
+       Mail From:
+    </td>
+    <td nowrap>
+    	<input class="text" type="text" name="fromAddr" id="fromAddr" value="$fromAddr">
+    	<div class="description">Required - One email address</div>
+    </td>
+</tr>
+
+<tr>
+    <td class="fieldLabelArea required"><sup style="color:red">*</sup>
+       Mail To:
+    </td>
+    <td nowrap>
+    	<input class="text" type="text" name="mailToAddr" id="mailToAddr" value="$mailToAddr">
+    	<div class="description">Required - One, or many comma separated email address(es)</div>
+    </td>
+</tr>
+
+<tr>
+    <td class="fieldLabelArea">
+       Reply To:
+    </td>
+    <td nowrap>
+    	<input class="text" type="text" name="replyToAddr" id="replyToAddr" value="$replyToAddr">
+    	<div class="description">Optional</div>
+    </td>
+</tr>
+
+<tr>
+    <td class="fieldLabelArea"><sup style="color:red">*</sup>
+        Mail Subject:
+    </td>
+    <td nowrap>
+    	<input class="text" type="text" name="mailSubj" id="mailSubj" value="$mailSubj">
+    	<div class="description">Required - System "Email Prefix" field will preface the subject</div>
+    </td>
+</tr>
+
+<tr>
+    <td class="fieldLabelArea">
+        Mail Body:
+    </td>
+    <td nowrap>
+    	<textarea name="mailBody" id="mailBody" rows="3" cols="50">$mailBody</textarea>
+    	<div class="description">Optional - Format can be text or html</div>
+    </td>
+</tr>
+
+<tr>
+    <td class="fieldLabelArea">
+        Custom Fields:
+    </td>
+    <td nowrap>
+    	<textarea name="mailBodyCustomFields" id="mailBodyCustomFields" rows="3" cols="50">$mailBodyCustomFields</textarea>
+    	<div class="description">Optional - Add comma-separated list of custom fields to add in the body of the email</div>
+    </td>
+</tr>
+
+<tr>
+    <td class="fieldLabelArea">
+        Linked Issue Custom Fields:
+    </td>
+    <td nowrap>
+    	<textarea name="linkedIssueCustomFields" id="linkedIssueCustomFields" rows="3" cols="50">$linkedIssueCustomFields</textarea>
+    	<div class="description">Optional - Add comma-separated list of custom fields to add in the linked issues section of the email</div>
+    </td>
+</tr>
+
+<tr>
+	<td/>
+	<td nowrap>
+		<input class="checkbox" type="checkbox" name="excludeClonedIssues" id="excludeClonedIssues" value="yes"
+		#if ($excludeClonedIssues && $excludeClonedIssues == "yes")
+		checked="yes"
+		#end
+		> Exclude Cloned Issues
+		<div class="description">When checked, cloned issues will not appear in the Linked Issues section of the email</div>
+	</td>
+</tr>

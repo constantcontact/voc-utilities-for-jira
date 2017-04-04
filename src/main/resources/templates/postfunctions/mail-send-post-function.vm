@@ -1,0 +1,7 @@
+#if ($jql != '')
+    When an issue matches JQL <b>$jql</b>, a notification will be sent to this email address:
+$mailToAddr
+#else
+    A notification will be sent to this email address:
+$mailTo
+#end

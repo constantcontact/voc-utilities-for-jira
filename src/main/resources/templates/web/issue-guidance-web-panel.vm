@@ -1,0 +1,109 @@
+#* VOC Guidance View
+ * This view renders in a VOC Issue Guidance panel on the right pane of the issue view screen.
+*#
+
+## ---------------- Begin Weighted Priority Guidance --------------------
+#if($isVisible.trim() == "yes")
+
+#if ($messageError)
+<div class="aui-message error"><span class="aui-icon icon-error"></span>
+$messageError</div>
+#end
+
+#if ($priority && $severity)
+<div>
+#end
+## --------------- Test For Fields NOT Default "None" -------------------
+#if ($priority == "None" && $severity == "None")
+    <img src="$baseUrl/images/icons/icon-warning.png" alt="warning" />
+    <span style="font-weight: bold; color: red;">Priority and Severity are not set!</span>
+#elseif ($priority == "None" && $severity)
+    <img src="$baseUrl/images/icons/icon-warning.png" alt="warning" />
+    <span style="font-weight: bold; color: red;">Priority is not set!</span>
+#elseif ($priority != "None" && $severity == "None")
+    <img src="$baseUrl/images/icons/icon-warning.png" alt="warning" />
+    <span style="font-weight: bold; color: red;">Severity is not set!</span>
+## --------------------- Test For Values --------------------------------
+#elseif ($priority == "Blocker" && $severity != "Enhancement")
+    <span style="font-weight: bold; color: white; background-color:darkred; padding:5px; margin-top:5px">
+    <img src="$baseUrl/images/icons/priority_blocker.gif" alt="Blocker" />
+    Blocker!! Expedite fix now.</span>
+#elseif ((($priority == "Critical" || $priority == "High" || $priority == "Major") && $severity == "Unusable") ||
+	(($priority == "Critical" || $priority == "High") && $severity == "Painful"))
+    <span style="font-weight: bold; color: white; background-color:red; padding:5px; margin-top:5px">
+    <img src="$baseUrl/images/icons/priority_critical.gif" alt="Critical Risk" />
+    Critical Risk! Stop delivery to fix.</span>
+#elseif ((($priority == "High" || $priority == "Major") && ($severity == "Painful" || $severity == "Annoying")) || 
+    ($priority == "Critical" && $severity == "Annoying"))
+    <span style="font-weight: bold; color: white; background-color:orange; padding:5px; margin-top:5px">
+    <img src="$baseUrl/images/icons/priority_major.gif" alt="Major Risk" />
+    Major Risk. Manage risk to resolve.</span>
+#elseif ((($priority == "Medium" || $priority == "Minor") 
+	&& ( $severity == "Unusable" || $severity == "Painful" || $severity == "Annoying" || $severity == "Polish")) ||
+    (($priority == "Critical" || $priority == "High" || $priority == "Major") && $severity == "Polish"))
+    <span style="font-weight: bold; color: white; background-color:green; padding:5px; margin-top:5px">
+    <img src="$baseUrl/images/icons/priority_minor.gif" alt="Minor Risk" />
+    Minor Risk. Fix as soon as feasible.</span>
+#elseif (($priority == "Low" || $priority == "Trivial") || ($severity == "Enhancement"))
+    <span style="font-weight:bold; color:white; background-color:darkgreen; padding:5px; margin-top:5px">
+    <img src="$baseUrl/images/icons/priority_trivial.gif" alt="Trivial Risk" />
+    Trivial Risk. Triage for future cycle.</span>
+#end
+## -------------------- Help Icon --------------------
+#if ($priority && $severity)
+<a href="$i18n.getText('issue-guidance-web-panel.help.url')" target="_blank">
+<img src="$baseUrl/images/icons/ico_help.png" alt="Jira Defect Instructions" /></a><br/>
+<div style="font-family:Arial,Helvetica,sans-serif; font-size:8pt; color: gray; margin-top:8px">
+Priority = $priority , Severity = $severity</div>
+## ------------------- End Section -------------------
+</div>
+#end
+
+#end
+## ----------------- End Weighted Priority Guidance --------------------
+
+## -------------- Begin Due Date Guidance ------------
+#*
+#if($daysAwayFromDueDate)
+  #set ($overdueDays = $daysAwayFromDueDate * -1)
+  <hr/>
+#end
+#if ($daysAwayFromDueDate && $daysAwayFromDueDate > 1 && $status != "Closed")
+    <span style="font-weight: bold; color: green;">This issue is due in $daysAwayFromDueDate days.</span><hr/>
+#elseif ($daysAwayFromDueDate && $daysAwayFromDueDate == 1 && $status != "Closed")
+    <span style="font-weight: bold; color: blue;">This is issue is due tomorrow.</span><hr/>
+#elseif ($daysAwayFromDueDate && $daysAwayFromDueDate == 0 && $status != "Closed")
+    <span style="font-weight: bold; color: purple;">This issue is due today.</span><hr/>
+#elseif ($daysAwayFromDueDate && $daysAwayFromDueDate == -1 && $status != "Closed")
+    <span style="font-weight: bold; color: #ff4500;">This issue was due yesterday!</span><hr/>
+#elseif ($daysAwayFromDueDate && $daysAwayFromDueDate < -1 && $status != "Closed")
+    <span style="font-weight: bold; color: red;">This issue is overdue by $overdueDays days!</span><hr/>
+#end
+*#
+## -------------- End Due Date Guidance --------------
+
+## ------------- Begin Resolution Guidance --------------
+#*
+#if ($status)
+<span style="font-weight: bold; color: blue;">
+Status = $status
+#end
+#if ($resolution)
+, Resolution = $resolution
+#end
+#if ($resolutionDate)
+, Resolution Date = $resolutionDate
+#end
+#if ($status)
+</span><br/>
+#end
+*#
+## ------------ Nudge use the right workflows ------------
+#*
+#if ($issueType)
+<span style="font-family:Arial,Helvetica,sans-serif; font-size:8pt; color: gray; margin-top:5px">
+Missing proper resolution?<br/>
+Are you using the right workflows for your issues?</span>
+#end
+*#
+## ---------------- End Resolution Section ---------------

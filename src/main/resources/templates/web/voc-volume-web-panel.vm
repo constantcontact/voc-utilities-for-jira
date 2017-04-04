@@ -1,0 +1,71 @@
+#* VOC Volume View
+ * This view renders in a VOC Volume panel on the right pane of the issue view screen.
+*#
+
+#if ($isVisible.trim() == "yes" && $hasAnyValues == true)
+
+## ---------------- Begin VOC Volume Web Panel --------------------
+#if ($messageError)
+<div class="aui-message error"><span class="aui-icon icon-error"></span>
+$messageError</div>
+#end
+
+## ------------------- Begin Section -------------------
+<div>
+
+## --------------------- Render Banner --------------------------------
+#if ($VOCVolumeBanner == "High")
+    <span style="font-weight: bold; color: white; background-color:darkred; padding:5px; margin-top:5px">
+    <img src="$baseUrl/images/icons/priority_critical.gif" alt="Very High Impact" />
+    $highGuidance</span>
+#elseif ($VOCVolumeBanner == "Medium")
+    <span style="font-weight: bold; color: white; background-color:orange; padding:5px; margin-top:5px">
+    <img src="$baseUrl/images/icons/priority_major.gif" alt="High Impact" />
+    $medGuidance</span>
+#elseif ($VOCVolumeBanner == "Low")
+    <span style="font-weight: bold; color: white; background-color:green; padding:5px; margin-top:5px">
+    <img src="$baseUrl/images/icons/priority_minor.gif" alt="Low Impact" />
+    $lowGuidance</span>
+#elseif($isVisible.trim() == "yes" && $hasAnyValues == true)
+    <span style="font-weight: bold; color: white; background-color:gray; padding:5px; margin-top:5px">
+    No VOC Volume sentiment</span>
+#end
+
+## -------------------- Render Help Icon --------------------
+#if ($VOCVolumeBanner && $isVisible.trim() == "yes" && $hasAnyValues == true)
+	<a href="$i18n.getText('voc-volume-servlet.help.url')" target="_blank">
+		<img src="$baseUrl/images/icons/ico_help.png" alt="Jira VOC Volume Instructions" /></a><br/>
+	<div style="font-family:Arial,Helvetica,sans-serif; font-size:8pt; color: gray; margin-top:8px">
+Click the help button for information about this web panel.</div>
+#end
+## ---------------------- End Banner -------------------
+
+## --------------------- Render Support Field Totals --------------------------------
+<div style="font-family:Arial,Helvetica,sans-serif; font-size:10pt; color: gray; margin-top:8px">
+#if ($Uservoice && $isVisible.trim() == "yes")
+	<span class="aui-lozenge aui-lozenge-subtle aui-lozenge-current">$Uservoice</span> Uservoice $UservoiceLabel<br/>
+#end
+#if ($SupportTracks && $isVisible.trim() == "yes")
+    <span class="aui-lozenge aui-lozenge-subtle aui-lozenge-current">$SupportTracks</span> Support Tracks $SupportTracksLabel<br/>
+#end
+#if ($Stand-ups && $isVisible.trim() == "yes")
+    <span class="aui-lozenge aui-lozenge-subtle aui-lozenge-current">$Stand-ups</span> Stand-ups $Stand-upsLabel<br/>
+#end
+#if ($Feedbackforums && $isVisible.trim() == "yes")
+    <span class="aui-lozenge aui-lozenge-subtle aui-lozenge-current">$Feedbackforums</span> Feedback Forums $FeedbackforumsLabel<br/>
+#end
+#if ($Salesforce && $isVisible.trim() == "yes")
+    <span class="aui-lozenge aui-lozenge-subtle aui-lozenge-current">$Salesforce</span> Salesforce $SalesforceLabel<br/>
+#end
+#if ($VOCVolumeOtherValue && $VOCVolumeOtherSelect.trim() != "" && $isVisible.trim() == "yes")
+    <span class="aui-lozenge aui-lozenge-subtle aui-lozenge-current">$VOCVolumeOtherValue</span> $VOCVolumeOtherSelect $VOCVolumeOtherLabel<br/>
+#elseif ($VOCVolumeOtherValue && $isVisible.trim() == "yes")
+    <span class="aui-lozenge aui-lozenge-subtle aui-lozenge-current">$VOCVolumeOtherValue</span> VOC Volume Other $VOCVolumeOtherLabel<br/>
+#end
+</div>
+
+## --------------------- End Totals --------------------------------
+</div>
+## ---------------- End VOC Volume Web Panel --------------------
+
+#end  ## End isVisible

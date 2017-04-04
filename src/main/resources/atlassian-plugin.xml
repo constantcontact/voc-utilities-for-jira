@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
+  <plugin-info>
+    <description>${project.description}</description>
+    <version>${project.version}</version>
+    <vendor name="${project.organization.name}" url="${project.organization.url}"/>
+    <param name="plugin-icon">images/happy_icon_16.gif</param>
+    <param name="plugin-logo">images/happy_icon_72.gif</param>
+    <param name="vendor-icon">images/happy_icon_16.gif</param>
+    <param name="vendor-logo">images/happy_icon_72.gif</param>
+    <param name="configure.url">/plugins/servlet/config/vocvolume</param>
+    <resource name="screenshot.png" location="images/screenshot.png"/>
+  </plugin-info>
+  <resource type="i18n" name="i18n" location="i18n/VOCUtilities"/>
+  <web-resource name="Resources" key="resources">
+    <dependency>com.atlassian.auiplugin:ajs</dependency>
+    <resource name="voc-volume-thumbnail.gif" type="download" location="images/voc-volume-thumbnail.gif"/>
+    <resource name="chart-defects-customer-found-thumbnail.gif" type="download" location="images/chart-defects-customer-found-thumbnail.gif"/>
+    <resource name="created-resolved-aging-thumbnail.gif" type="download" location="images/created-resolved-aging-thumbnail.gif"/>
+  </web-resource>
+  <web-resource name="VOC Volume Resources" key="voc-volume-styles" >
+    <resource name="voc-volume-styles.css" type="download" location="styles/voc-volume-styles.css">
+      <property key="content-type" value="text/css"/>
+    </resource>
+  </web-resource>
+  <web-resource name="Charts Styles" key="charts-styles" >
+    <resource name="chart-styles.css" type="download" location="styles/chart-styles.css">
+      <property key="content-type" value="text/css"/>
+    </resource>
+  </web-resource>
+  <web-resource name="Charts Resources" key="charts-resources" >
+    <!-- <dependency>com.atlassian.auiplugin:ajs</dependency> -->
+    <!--
+    <resource name="rickshaw.min.css" type="download" location="styles/rickshaw.min.css">
+      <property key="content-type" value="text/css"/>
+    </resource>
+    <resource name="nv.d3.css" type="download" location="styles/nv.d3.css">
+      <property key="content-type" value="text/css"/>
+    </resource>
+    -->
+    <!-- <resource name="rickshaw.min.js" type="download" location="js/rickshaw.min.js" /> -->
+    <resource name="d3.v3.js" type="download" location="js/d3.v3.js" />
+    <resource name="linear.regression.js" type="download" location="js/linear.regression.js" />
+    <resource name="month.over.month.js" type="download" location="js/month.over.month.js" />
+    <resource name="text.width.js" type="download" location="js/text.width.js" />
+    <!-- <resource name="nv.d3.js" type="download" location="js/nv.d3.js" /> -->
+    <!-- <resource name="defect_data.nv.json" type="download" location="json/defect_data.nv.json" /> -->
+    <context>com.voc.jira.plugins.charts-context</context>
+  </web-resource>
+  <component-import key="templateRenderer" interface="com.atlassian.templaterenderer.velocity.one.six.VelocityTemplateRenderer"/>
+  <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager"/>
+  <component-import key="loginUriProvider" interface="com.atlassian.sal.api.auth.LoginUriProvider"/>
+  <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties"/>
+  <component-import key="pluginSettingsFactory" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory"/>
+  <component-import key="i18nResolver" interface="com.atlassian.sal.api.message.I18nResolver"/>
+  <component name="Configuration Manager" key="configurationManager" class="com.voc.jira.plugins.jira.components.ConfigurationManager">
+    <description>Stores the central configuration for this plugin.</description>
+  </component>
+  <component name="Component Accessor" key="componentAccessor" class="com.atlassian.jira.component.ComponentAccessor">
+    <description>Accesses the common properties for this plugin.</description>
+  </component>
+  <workflow-validator key="priority-field-validator" name="Priority Field Validator" i18n-name-key="Priority Field Validator" class="com.voc.jira.plugins.jira.workflow.PriorityNotNoneValidatorFactory">
+    <description key="Priority Field Validator (value not &apos;None&apos;)">Assure a value of a field</description>
+    <validator-class>com.voc.jira.plugins.jira.workflow.PriorityNotNoneValidator</validator-class>
+    <resource type="velocity" name="view" location="templates/validators/priority-not-none-validator-noop.vm"/>
+    <resource type="velocity" name="edit-parameters" location="templates/validators/priority-not-none-validator-noop.vm"/>
+    <resource type="velocity" name="input-parameters" location="templates/validators/priority-not-none-validator-noop.vm"/>
+  </workflow-validator>
+  <workflow-validator key="severity-field-validator" name="Severity Field Validator" i18n-name-key="Severity Field Validator" class="com.voc.jira.plugins.jira.workflow.SeverityNotNoneValidatorFactory">
+    <description key="Severity Field Validator (value not &apos;None&apos;)">Assure a value of a field</description>
+    <validator-class>com.voc.jira.plugins.jira.workflow.SeverityNotNoneValidator</validator-class>
+    <resource type="velocity" name="view" location="templates/validators/severity-not-none-validator-noop.vm"/>
+    <resource type="velocity" name="edit-parameters" location="templates/validators/severity-not-none-validator-noop.vm"/>
+    <resource type="velocity" name="input-parameters" location="templates/validators/severity-not-none-validator-noop.vm"/>
+  </workflow-validator>
+  <workflow-function key="mail-send-post-function" name="Mail Send Post Function"
+                       i18n-name-key="mail-send-post-function.name"
+                       class="com.voc.jira.plugins.jira.workflow.MailSendPostFunctionFactory">
+    <description key="mail-send-post-function.description">The Hip Chat Post Function Plugin</description>
+    <function-class>com.voc.jira.plugins.jira.workflow.MailSendPostFunction</function-class>
+    <resource type="velocity" name="view" location="templates/postfunctions/mail-send-post-function.vm"/>
+    <resource type="velocity" name="input-parameters"
+              location="templates/postfunctions/mail-send-post-function-input.vm"/>
+    <resource type="velocity" name="edit-parameters"
+              location="templates/postfunctions/mail-send-post-function-input.vm"/>
+  </workflow-function>
+  <web-panel name="Issue Guidance Web Panel" i18n-name-key="issue-guidance-web-panel.name" key="issue-guidance-web-panel" 
+  		     location="atl.jira.view.issue.right.context" weight="51">
+    <description key="issue-guidance-web-panel.description">Web Panel "VOC Issue Guidance" on the issue view screen with weighted priority and other recommendations.</description>
+    <context-provider class="com.voc.jira.plugins.jira.workflow.IssueGuidanceWebPanel"/>
+    <label key="issue-guidance-web-panel.title"/>
+    <resource name="view" type="velocity" location="templates/web/issue-guidance-web-panel.vm"/>
+    <resource name="com.voc.jira.plugins.jira.workflow.IssueGuidanceWebPanel" type="download" 
+    		  location="com.voc.jira.plugins.jira.workflow.IssueGuidanceWebPanel"/>
+  </web-panel>
+  <web-panel name="VOC Volume Web Panel" i18n-name-key="voc-volume-web-panel.name" key="voc-volume-web-panel" 
+  		     location="atl.jira.view.issue.right.context" weight="50">
+    <description key="voc-volume-web-panel.description">Web Panel "VOC Volume" on the project issue view screen with totals of linked support issue counts.</description>
+    <context-provider class="com.voc.jira.plugins.jira.workflow.VOCVolumeWebPanel"/>
+    <label key="voc-volume-web-panel.title"/>
+    <resource name="view" type="velocity" location="templates/web/voc-volume-web-panel.vm"/>
+    <resource name="com.voc.jira.plugins.jira.workflow.VOCVolumeWebPanel" type="download" 
+    		  location="com.voc.jira.plugins.jira.workflow.VOCVolumeWebPanel"/>
+  </web-panel>
+  <servlet name="VOC Utilities Configuration VOCVolume Administration Servlet" key="config-vocvolume-admin-servlet" 
+  		   class="com.voc.jira.plugins.jira.servlet.ConfigVOCVolumeAdminServlet" i18n-name-key="config-vocvolume-admin-servlet.name"> 
+    <description key="config-vocvolume-admin-servlet.description">The VOC Utilities Admin Servlet Plugin</description>
+    <url-pattern>/config/vocvolume</url-pattern> 
+  </servlet>
+  <servlet name="VOC Volume Servlet" i18n-name-key="voc-volume-servlet.name" key="voc-volume-servlet" class="com.voc.jira.plugins.jira.servlet.VOCVolume">
+    <description key="voc-volume-servlet.description">The VOC Volume Plugin</description>
+    <url-pattern>/vocvolume</url-pattern>
+  </servlet>
+  <servlet name="Charts Servlet" i18n-name-key="charts-servlet.name" key="charts-servlet" class="com.voc.jira.plugins.jira.servlet.Charts">
+    <description key="charts-servlet.description">D3JS Charts for dashboards</description>
+    <url-pattern>/charts</url-pattern>
+  </servlet>
+  <servlet name="Created and Resolved Servlet" i18n-name-key="created-resolved-servlet.name" key="created-and-resolved-servlet" class="com.voc.jira.plugins.jira.servlet.CreatedAndResolved">
+    <description key="created-resolved-servlet.description">Created And Resolved</description>
+    <url-pattern>/created-and-resolved</url-pattern>
+  </servlet>
+
+  <web-section name="VOC Utilities Admin Section" key="voc_utilities_section" location="admin_plugins_menu"> 
+    <label key="VOC Utilities"/>
+    <description>Left-nav section in the Manager Add-ons tab</description>
+  </web-section>
+  <web-item name="VOC Volume Configuration" key="jira-menu-item" i18n-name-key="config.vocvolume" 
+  		weight="10" application="jira" section="admin_plugins_menu/voc_utilities_section"> 
+    <!-- section="top_system_section/security_section" weight="150" application="jira"> -->
+    <description>Configure Issue features for Jira Issues and Workflows.</description> 
+    <label key="config.vocvolume.label" />
+    <link linkId="config.vocvolume.link">/plugins/servlet/config/vocvolume</link>
+  </web-item>
+  
+  <gadget name="VOC Volume Gadget" key="voc-volume-gadget" location="gadgets/voc-volume.xml">
+    <description>A gadget that renders a list of issues linked to VOC Volume reports.</description>
+  </gadget>
+  <gadget name="Customer Found Gadget" key="customer-found-gadget" location="gadgets/chart-defect-customer-found.xml">
+    <description>A gadget that renders a chart of all defects and customer found trends.</description>
+  </gadget>
+  <gadget name="Created vs Resolved Aging Gadget" key="created-resolved-aging-gadget" location="gadgets/created-resolved-aging.xml">
+    <description>A gadget that renders a chart showing defect work in selected months -- defect creation, resolution, aging.</description>
+  </gadget>
+  
+   <jql-function key="linked-issuetype-created-before" i18n-name-key="linkedIssuetypeCreatedBefore.name" name="Linked IssueType Created Before Function"
+      class="com.voc.jira.plugins.jira.jql.LinkedIssueTypeCreatedBefore">
+    <!-- <resource type="i18n" name="i18n" location="com.voc.jira.plugins.jira.jql.LinkedIssueTypeCreatedBefore" /> -->
+	<description key="linkedIssuetypeCreatedBefore.description">JQL function to return issues linked created prior to issue</description>
+	<fname>linkedCreatedBefore</fname>
+	<list>true</list>
+  </jql-function>
+   <jql-function key="linked-issuetype-created-before-query" i18n-name-key="linkedIssuetypeCreatedBeforeQuery.name" name="Linked IssueType Created Before Query Function"
+      class="com.voc.jira.plugins.jira.jql.LinkedIssueTypeCreatedBeforeQuery">
+	<description key="linkedIssuetypeCreatedBeforeQuery.description">JQL function to return issues linked created prior to issue</description>
+	<fname>linkedCreatedBeforeQuery</fname>
+	<list>true</list>
+  </jql-function>
+</atlassian-plugin>

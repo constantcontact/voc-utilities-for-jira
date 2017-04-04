@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+  <ModulePrefs 
+    title="Defect Counts and Trends" 
+    directory_title="Defect Counts and Trends" 
+    height="250" 
+    author="Constant Contact, Inc." 
+    author_affiliation="CTCT" author_location="Waltham, MA USA" 
+    author_email="david@jellisons.net" 
+    thumbnail='#staticResourceUrl("com.voc.jira.plugins.VOC-Utilities:resources",
+    	"chart-defects-customer-found-thumbnail.gif")'
+    description="Customer facing and customer found defects counts and trends">
+    <icon>http://www.constantcontact.com/favicon.ico</icon>
+    <Optional feature="atlassian.util" />
+    <Optional feature="gadget-directory">
+	  <Param name="categories">
+	    JIRA
+	  </Param>
+	</Optional>
+    <Require feature="minimessage" />
+    <Require feature="dynamic-height" />
+    <Optional feature="auth-refresh"/>
+    <Require feature="oauthpopup" />
+    <Require feature="settitle" />
+    <Require feature="setprefs" />
+	<Require feature="views" />
+	#oauth
+    #supportedLocales("gadget.common,i18n")
+  </ModulePrefs>
+
+  <UserPref name="isConfigured" datatype="hidden" default_value="false" />
+  <UserPref name="subtitle" display_name="subtitle:" datatype="hidden" default_value="" required="false"/>
+  <UserPref name="whichCharts" display_name="which charts:" default_value="both" required="true"/>
+  <UserPref name="allProjects" display_name="Include all projects:" default_value="false" required="true"/>
+  <UserPref name="projects" display_name="list of projects:" datatype="hidden" default_value="" required="false"/>
+  <UserPref name="custom_jql" display_name="custom jql:" default_value="" required="false"/>
+  <UserPref name="scope" display_name="scope:" default_value="true" required="true"/>
+  <UserPref name="lookback" display_name="time period:" default_value="4" required="true"/>
+  <UserPref name="begin_date" display_name="begin date (YYYY-MM-DD):" default_value="2013-12-01" required="true"/>
+  <UserPref name="end_date" display_name="end date (YYYY-MM-DD):" default_value="2014-05-01" required="true"/>
+  <UserPref name="hc" display_name="hard coded data:" default_value="false" required="true"/>
+  <UserPref name="h" display_name="height:" default_value="600" required="false"/>
+  <UserPref name="w" display_name="width:" default_value="500" required="false"/>
+  <UserPref name="trendHeight" display_name="trend height:" default_value="80" required="false"/>
+  <UserPref name="isPopup" datatype="hidden" default_value="false"/>
+  <UserPref name="projectOrFilterId" datatype="hidden" />
+  <UserPref name="refresh" datatype="hidden" default_value="false" />
+
+  <Content type="html" view="profile,canvas,home">
+  	<![CDATA[
+  	#requireResource("com.atlassian.auiplugin:ajs")
+  	#requireResource("com.atlassian.jira.gadgets:jira-global")
+  	#requireResource("com.atlassian.gadgets.publisher:ajs-gadgets")
+  	#requireResource("jira.webresources:autocomplete")
+    #requireResource("com.voc.jira.plugins.VOC-Utilities:charts-styles")
+    #includeResources()
+    
+    <script type="text/javascript">
+
+	/* Create minimessage factory & Show a small loading message to the user
+	   https://developers.google.com/gadgets/docs/reference/#gadgets.MiniMessage 
+	   another example: minimsg.createDismissibleMessage("Lucky you!").style.backgroundColor = "SeaShell"; */
+	var minimsg = new gadgets.MiniMessage(__MODULE_ID__); //https://developers.google.com/gadgets/docs/ui#Mini
+	var loadMessage = minimsg.createStaticMessage("loading... <img src=\"__ATLASSIAN_BASE_URL__/images/gadgets/loading_100.gif\" />");
+    (function () {
+        var gadget = AJS.Gadget({
+          baseUrl: "__ATLASSIAN_BASE_URL__",
+          useOauth: "/rest/gadget/1.0/currentUser",
+          config: {
+            descriptor: function (args) {
+              var gadget = this;
+              var projectPicker = AJS.gadget.fields.projectPicker(gadget, "projects", args.projectlist);
+              //var projectPicker = AJS.gadget.fields.projectsAndCategoriesPicker(gadget, "projects", args.projectlist);
+              var projectName = "";
+              minimsg.dismissMessage(loadMessage);
+              return  {
+                theme: function () {
+					if (gadgets.window.getViewportDimensions().width < 500){
+						return "top-label";
+					} else{
+						return "long-label";
+					}
+				}(),
+                fields: [  //https://developer.atlassian.com/display/GADGETS/Field+Definitions
+                {
+			        userpref: "subtitle",
+			        class: "textBox",
+			        label: gadget.getMsg("gadget.common.display.text.subtitle.label"),
+			        description: gadget.getMsg("gadget.common.display.text.subtitle.description"),
+			        type: "text",
+			        value: gadget.getPref("subtitle")
+			    },
+			    {
+			        userpref: "allProjects",
+			        class: "cumulative-select-list",
+			        label: gadget.getMsg("gadget.common.display.text.all.label"),
+			        description: gadget.getMsg("gadget.common.display.text.all.description"),
+			        type: "select",
+			        selected: gadget.getPref("allProjects"),
+			        options:[
+			          {
+			        	label: "Yes",
+			        	value: "true"
+			          },
+			          {
+			            label: "No",
+			            value: "false"
+			          }
+			        ]
+			    },
+			    jQuery.extend(true, {}, projectPicker, {
+                    label: gadget.getMsg('gadget.common.display.text.projects.label'),
+			        description: gadget.getMsg("gadget.common.display.text.projects.description"),
+			        type: "multiselect",
+			        value: gadget.getPref("projects"),
+                }),
+                //AJS.gadget.fields.projectsAndCategoriesPicker(gadget, "projectsOrCategories", args.options),
+			    {
+			        userpref: "custom_jql",
+			        class: "textBox",
+			        label: gadget.getMsg("gadget.common.display.text.customJql.label"),
+			        description: gadget.getMsg("gadget.common.display.text.customJql.description"),
+			        type: "text",
+			        value: gadget.getPref("custom_jql")
+			    },
+			    {
+			        userpref: "scope",
+			        class: "cumulative-select-list",
+			        label: gadget.getMsg("gadget.common.display.text.scope.label"),
+			        description: gadget.getMsg("gadget.common.display.text.scope.description"),
+			        type: "select",
+			        selected: gadget.getPref("scope"),
+			        options:[
+			          {
+			        	label: "Absolute - specify begin and end dates",
+			        	value: "true"
+			          },
+			          {
+			            label: "Relative - specify number of months to look back",
+			            value: "false"
+			          }
+			        ]
+			    },
+			    {
+			        userpref: "begin_date",
+			        class: "textBox",
+			        label: gadget.getMsg("gadget.common.display.text.begindate.label"),
+			        description: gadget.getMsg("gadget.common.display.text.begindate.description"),
+			        type: "text",
+			        value: gadget.getPref("begin_date")
+			    },
+			    {
+			        userpref: "end_date",
+			        class: "textBox",
+			        label: gadget.getMsg("gadget.common.display.text.enddate.label"),
+			        description: gadget.getMsg("gadget.common.display.text.enddate.description"),
+			        type: "text",
+			        value: gadget.getPref("end_date")
+			    },
+			    {
+			        userpref: "lookback",
+			        class: "textBox",
+			        label: gadget.getMsg("gadget.common.display.text.lookback.label"),
+			        description: gadget.getMsg("gadget.common.display.text.lookback.description"),
+			        type: "text",
+			        value: gadget.getPref("lookback")
+			    },
+			    {
+			        userpref: "h",
+			        class: "textBox",
+			        label: gadget.getMsg("gadget.common.display.text.h.label"),
+			        description: gadget.getMsg("gadget.common.display.text.h.description"),
+			        type: "text",
+			        value: gadget.getPref("h")
+			    },
+			    {
+			        userpref: "w",
+			        class: "textBox",
+			        label: gadget.getMsg("gadget.common.display.text.w.label"),
+			        description: gadget.getMsg("gadget.common.display.text.w.description"),
+			        type: "text",
+			        value: gadget.getPref("w")
+			    },
+			    {
+			        userpref: "trendHeight",
+			        class: "textBox",
+			        label: gadget.getMsg("gadget.common.display.text.trendHeight.label"),
+			        description: gadget.getMsg("gadget.common.display.text.trendHeight.description"),
+			        type: "text",
+			        value: gadget.getPref("trendHeight")
+			    },
+			    {
+			        userpref: "whichCharts",
+			        class: "select-list",
+			        label: gadget.getMsg("gadget.common.display.text.whichCharts.label"),
+			        description: gadget.getMsg("gadget.common.display.text.whichCharts.description"),
+			        type: "select",
+			        selected: gadget.getPref("whichCharts"),
+			        options:[
+			          {
+			        	label: "Both",
+			        	value: "both"
+			          },
+			          {
+			            label: "Business Critical Only",
+			            value: "bc"
+			          },
+			          {
+			            label: "Customer Facing Only",
+			            value: "cf"
+			          }
+			        ]
+			    },
+			    AJS.gadget.fields.nowConfigured()
+			  ]
+              };
+              //resize();
+            },
+            args: [
+            	{
+            		key: "projectlist",
+            		ajaxOptions: "__ATLASSIAN_BASE_URL__/rest/gadget/1.0/filtersAndProjects?showFilters=false"
+            	}
+            ]
+          },
+          view: {
+		    onResizeReload: true,
+            onResizeAdjustHeight: true,
+		    template: function (args) {
+		      AJS.log("Charts: Hooray, got ", args);
+		      var gadget = this;
+		      gadgets.window.setTitle(AJS.format("{0}: {1}", 
+                  "__MSG_gadget.common.display.chart.bar.title__", 
+                  gadget.getPref("subtitle")
+                  ));
+		      gadget.removeMenuItem("edit");
+		      gadget.getView().empty(); // clear existing content
+			  gadget.hideLoading();		      
+		      //gadget.getConfig().empty(); // clear existing form
+		      //loadMessage = minimsg.createStaticMessage("loading... <img src=\"__ATLASSIAN_BASE_URL__/images/gadgets/loading_100.gif\" />");	      
+		      AJS.$.ajax({
+		      	url: args.options.ajaxOptions,
+		      	type: "GET",
+		      	contentType: "text/html",
+		      	//async: false,
+		      	success: function(response) {
+		      	  AJS.log("Success");
+		      	  console.log("Gadget is ", gadget);
+		      	  minimsg.dismissMessage(loadMessage);
+		      	  AJS.$("#content_div").show().html(args.options);
+		      	  resize();
+		      	},
+		      	error: function(response) {
+		      	  AJS.log("Error on service call - response code: " + response.rc);
+		      	  AJS.$("#content_div").show().html(exception);
+		      	  minimsg.dismissMessage(loadMessage);
+  				  resize();
+  				  //gadget.showMessage("error","popup dialog on error",true,true);
+		      	}
+	      	 });
+		    },
+		    args: [{
+		        key: "options",
+		        ajaxOptions: function () {
+		          try {
+		          	this.getConfig().empty(); // clear existing form
+		          } catch(err) {
+		          }
+		     	  resize();
+     		      AJS.$("#content_div").show().html(null);
+		          this.showLoading();
+		          var prefs = new gadgets.Prefs();
+		          var r = { url: "__ATLASSIAN_BASE_URL__/plugins/servlet/charts",
+    		                data: {
+	    	                  customJql: prefs.getString("custom_jql"),
+		                      scope: prefs.getString("scope"),
+		                      lookback: prefs.getString("lookback"),
+		                      beginDate: prefs.getString("begin_date"),
+		                      endDate: prefs.getString("end_date"),
+    		                  whichCharts: prefs.getString("whichCharts"),
+		                      w: prefs.getString("w"),
+		                      h: prefs.getString("h"),
+		                      trendHeight: prefs.getString("trendHeight"),
+		                    },
+		                    contentType: "text/html",
+		                    dataType: "html"
+		                  };
+		          if (prefs.getString("allProjects") != "true") {
+		            if ("" == prefs.getString("projects")) {
+		              r["data"]["error"] = "You chose not to include all Product Delivery projects. Therefore you must select one or more Projects.";
+		            } else {
+		              r["data"]["projects"] = prefs.getString("projects");
+		            }
+				  }
+				  return r;
+		          }
+		        }
+		    ]
+		  }
+        });
+      })();
+      
+      function resize() {
+        //minimsg.dismissMessage(loadMessage);
+		gadgets.window.adjustHeight();
+	  }
+	  window.onload=resize();
+	  
+    </script>
+
+    <div id="content_div"></div>
+    
+    ]]>
+  </Content>
+</Module>

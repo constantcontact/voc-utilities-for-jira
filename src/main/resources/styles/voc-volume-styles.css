@@ -1,0 +1,106 @@
+#content_div {
+  font-size: 80%;
+  background-color: white;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow:auto;
+}
+
+.list-heading {
+  background-color: #E8EEF7;
+  font-weight: bold;
+  font-size: 12px;
+  margin: 0;
+  padding: 5px;
+}
+
+.issuerow {
+  font-family:Arial;
+  font-size:16px;
+  color:gray;
+  background-color: white;
+  border-top-style:dotted;
+  border-top-color:gray;
+  border-top-width:1px;
+  padding:5px 10px 5px 0;
+}
+
+.issuerow.issuerow-closed {
+  background-color:MintCream;
+}
+
+.issueline {
+  font-family:Arial;
+  font-size:12px;
+  margin-left:20px;
+  padding:0 10px 5px 0;
+}
+
+.issue-line-through {
+	text-decoration:line-through;
+}
+
+.biz-critical {
+  padding:4px 4px 0px 4px;
+  border: 1px solid #8B0000;
+  border-radius:10px;
+}
+
+.banner {
+  font-weight: bold; 
+  padding:5px; 
+  margin-top:5px;
+}
+
+.banner.banner-high {
+  color:#8B0000; 
+  border-bottom: 1px solid #8B0000;
+}
+
+.banner.banner-medium {
+  color: orange; 
+  border-bottom: 1px solid orange;
+}
+
+.banner.banner-medium-old {
+  color: white; 
+  background-color:orange; 
+}
+.banner.banner-low {
+  color:green; 
+  border-bottom: 1px solid green;
+}
+
+.banner.banner-missing {
+  color:gray; 
+  border-bottom: 1px solid gray;
+}
+
+.content-body {
+  margin: 0;
+  padding: 10px;
+}
+
+.list-footer{
+  background-color: #E8EEF7;
+  font-weight: bold;
+  font-size: 12px;
+  margin: 0;
+  padding: 6px;
+  border-top-style:dotted;
+  border-top-color:gray;
+  border-top-width:1px;
+}
+
+.title {
+  background-color: #E8EEF7;
+  font-weight: bold;
+  margin: 0;
+  padding: 10px;
+}
+
+.a {
+  font-size: 10px;
+}
+
