@@ -35,6 +35,7 @@ public class IssueGuidanceWebPanel extends AbstractJiraContextProvider {
 	//private SelectSeverityField<?, ?> selectSeverityField;
 	private ArrayList<String> defectTypes = new ArrayList<String>();
 	private String baseUrl = "";
+	@SuppressWarnings("unused")
 	private String isVisible = "yes";
 	
 	
