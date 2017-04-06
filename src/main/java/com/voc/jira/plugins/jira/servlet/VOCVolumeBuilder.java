@@ -558,7 +558,8 @@ public class VOCVolumeBuilder {
     
     private String getCurrentIssueSeverity(Issue issue) {
     	String strSeverityHtml = "";
-    	if(customFieldManager.getCustomFieldObjectByName(SelectSeverityField.getSeverityFieldName())
+    	if(SelectSeverityField.isSeverity() 
+    			&& customFieldManager.getCustomFieldObjectByName(SelectSeverityField.getSeverityFieldName())
     			.getValue(issue) != null) {
     		strSeverityHtml = 
     				customFieldManager.getCustomFieldObjectByName(SelectSeverityField.getSeverityFieldName()).getValue(issue).toString();
