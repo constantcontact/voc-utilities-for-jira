@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Module>
 	<ModulePrefs title="VOC Volume" directory_title="VOC Volume"
-		height="250" author="Constant Contact, Inc." author_affiliation="CTCT"
-		author_location="Waltham, MA USA" author_email="david@jellisons.net"
+		height="250" author="David Jellison" 
+		author_affiliation="EIGI"
+		author_location="Amesbury, MA USA" 
+		author_email="david@jellisons.net"
 		thumbnail='#staticResourceUrl("com.voc.jira.plugins.VOC-Utilities:resources",
     	"voc-volume-thumbnail.gif")'
 		description="A list of issues with linked VOC Volume reports">
-		<icon>http://www.constantcontact.com/favicon.ico</icon>
+		<icon>#staticResourceUrl("com.voc.jira.plugins.VOC-Utilities:resources","voc-16.ico")</icon>
 		<Optional feature="atlassian.util" />
 		<Optional feature="gadget-directory">
 			<Param name="categories">

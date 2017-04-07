@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Module>
   <ModulePrefs 
-    title="Defects Created vs. Resolved Aging" 
-    directory_title="Defects Created vs. Resolved Aging" 
+    title="VOC Defects Created vs. Resolved Aging" 
+    directory_title="VOC Defects Created vs. Resolved Aging" 
     height="250" 
-    author="Constant Contact, Inc." 
-    author_affiliation="CTCT" author_location="Waltham, MA USA" 
+    author="David Jellison" 
+    author_affiliation="EIGI" author_location="Amesbury, MA USA" 
     author_email="david@jellisons.net" 
     thumbnail='#staticResourceUrl("com.voc.jira.plugins.VOC-Utilities:resources",
     	"created-resolved-aging-thumbnail.gif")'
     description="Creation, resolution and aging of defects">
-    <icon>http://www.constantcontact.com/favicon.ico</icon>
+    <icon>#staticResourceUrl("com.voc.jira.plugins.VOC-Utilities:resources","voc-16.ico")</icon>
     <Optional feature="atlassian.util" />
     <Optional feature="gadget-directory">
 	  <Param name="categories">
