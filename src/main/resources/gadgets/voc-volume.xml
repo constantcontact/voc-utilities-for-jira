@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+	<ModulePrefs title="VOC Volume" directory_title="VOC Volume"
+		height="250" author="Constant Contact, Inc." author_affiliation="CTCT"
+		author_location="Waltham, MA USA" author_email="david@jellisons.net"
+		thumbnail='#staticResourceUrl("com.voc.jira.plugins.VOC-Utilities:resources",
+    	"voc-volume-thumbnail.gif")'
+		description="A list of issues with linked VOC Volume reports">
+		<icon>http://www.constantcontact.com/favicon.ico</icon>
+		<Optional feature="atlassian.util" />
+		<Optional feature="gadget-directory">
+			<Param name="categories">
+				JIRA
+			</Param>
+		</Optional>
+		<Require feature="minimessage" />
+		<Require feature="dynamic-height" />
+		<Optional feature="auth-refresh" />
+		<Require feature="oauthpopup" />
+		<Require feature="settitle" />
+		<Require feature="setprefs" />
+		<Require feature="views" />
+		#oauth
+		#supportedLocales("gadget.common,i18n")
+	</ModulePrefs>
+
+	<UserPref name="isConfigured" datatype="hidden" default_value="false" />
+	<UserPref name="num_issues_limit" display_name="Search Max:"
+		default_value="10000" required="true" />
+	<UserPref name="num_results_limit" display_name="Results Max:"
+		default_value="10000" required="true" />
+	<UserPref name="text_jql" display_name="Filter:"
+		default_value="" required="false" />
+	<UserPref name="no_total" display_name="Exclude 0 Totals:"
+		default_value="true" required="true" />
+	<UserPref name="escaping_only" display_name="Escaping Only:"
+		default_value="false" required="true" />
+	<UserPref name="sort_total" display_name="Sort By Total:"
+		default_value="false" required="true" />
+	<UserPref name="isPopup" datatype="hidden" default_value="false" />
+	<UserPref name="projectOrFilterId" datatype="hidden" />
+	<UserPref name="refresh" datatype="hidden" default_value="false" />
+
+	<Content type="html" view="profile,canvas,home">
+  	<![CDATA[
+  	#requireResource("com.atlassian.auiplugin:ajs")
+  	#requireResource("com.atlassian.gadgets.publisher:ajs-gadgets")
+    #requireResource("com.voc.jira.plugins.VOC-Utilities:voc-volume-styles")
+    #includeResources()
+    
+    <script type="text/javascript">
+
+	/* Create minimessage factory & Show a small loading message to the user
+	   https://developers.google.com/gadgets/docs/reference/#gadgets.MiniMessage 
+	   another example: minimsg.createDismissibleMessage("Lucky you!").style.backgroundColor = "SeaShell"; */
+	var minimsg = new gadgets.MiniMessage(__MODULE_ID__);
+	var loadMessage = minimsg.createStaticMessage("loading... <img src=\"__ATLASSIAN_BASE_URL__/images/gadgets/loading_100.gif\" />");
+    
+    (function () {
+        var gadget = AJS.Gadget({
+          baseUrl: "__ATLASSIAN_BASE_URL__",
+          useOauth: "/rest/gadget/1.0/currentUser",
+          config: {
+            descriptor: function (args) {
+              var gadget = this;
+              minimsg.dismissMessage(loadMessage);
+              return  {
+                theme: function () {
+					if (gadgets.window.getViewportDimensions().width < 500){
+						return "top-label";
+					} else{
+						return "long-label";
+					}
+				}(),
+                fields: [  //https://developer.atlassian.com/display/GADGETS/Field+Definitions
+			    {
+			        id: "numIssuesToDisplay",
+			        userpref: "num_issues_limit",
+			        class: "numField",
+			        label: gadget.getMsg("gadget.common.display.num.searchmax.label"),
+			        description: gadget.getMsg("gadget.common.display.num.searchmax.description"),
+			        type: "text",
+			        value: gadget.getPref("num_issues_limit")
+			    },
+			    {
+			        id: "numResultsToDisplay",
+			        userpref: "num_results_limit",
+			        class: "numField",
+			        label: gadget.getMsg("gadget.common.display.num.resultsmax.label"),
+			        description: gadget.getMsg("gadget.common.display.num.resultsmax.description"),
+			        type: "text",
+			        value: gadget.getPref("num_results_limit")
+			    },
+			    {
+			        id: "textJqlToDisplay",
+			        userpref: "text_jql",
+			        class: "textBox",
+			        label: gadget.getMsg("gadget.common.display.text.filter.label"),
+			        description: gadget.getMsg("gadget.common.display.text.filter.description"),
+			        type: "textarea",
+			        value: gadget.getPref("text_jql")
+			    },
+			    {
+			        id: "selectNoTotal",
+			        userpref: "no_total",
+			        class: "cumulative-select-list",
+			        label: gadget.getMsg("gadget.common.groups.label"),
+			        description: gadget.getMsg("gadget.common.groups.description"),
+			        type: "select",
+			        selected: gadget.getPref("no_total"),
+			        options:[
+			          {
+			        	label: "Yes",
+			        	value: "true"
+			          },
+			          {
+			            label: "No",
+			            value: "false"
+			          }
+			        ]
+			    },
+			    {
+			        id: "selectSortTotal",
+			        userpref: "sort_total",
+			        class: "cumulative-select-list",
+			        label: gadget.getMsg("gadget.common.groups.sort.label"),
+			        description: gadget.getMsg("gadget.common.groups.sort.description"),
+			        type: "select",
+			        selected: gadget.getPref("sort_total"),
+			        options:[
+			          {
+			        	label: "Yes",
+			        	value: "true"
+			          },
+			          {
+			            label: "No",
+			            value: "false"
+			          }
+			        ]
+			    },
+			    {
+			        id: "selectSortVOCWeightedVolume",
+			        userpref: "sort_voc_volume",
+			        class: "cumulative-select-list",
+			        label: gadget.getMsg("gadget.common.groups.sortvoc.label"),
+			        description: gadget.getMsg("gadget.common.groups.sortvoc.description"),
+			        type: "select",
+			        selected: gadget.getPref("sort_voc_volume"),
+			        options:[
+			          {
+			        	label: "Yes",
+			        	value: "true"
+			          },
+			          {
+			            label: "No",
+			            value: "false"
+			          }
+			        ]
+			    },
+			    {
+			        id: "escapingOnly",
+			        userpref: "escaping_only",
+			        class: "cumulative-select-list",
+			        label: gadget.getMsg("gadget.common.groups.escaping.label"),
+			        description: gadget.getMsg("gadget.common.groups.escaping.description"),
+			        type: "select",
+			        selected: gadget.getPref("escaping_only"),
+			        options:[
+			          {
+			        	label: "Yes",
+			        	value: "true"
+			          },
+			          {
+			            label: "No",
+			            value: "false"
+			          }
+			        ]
+			    },
+			    AJS.gadget.fields.nowConfigured()
+			  ]
+              };
+              //resize();
+            }
+          },
+          view: {
+            enableReload: true,
+		    onResizeReload: false,
+            onResizeAdjustHeight: true,
+		    template: function (args) {
+		      AJS.log("VOC volume: Hooray, got ", args);
+		      var gadget = this;
+		      gadget.removeMenuItem("edit");
+		      gadget.getView().empty(); // clear existing content	      
+		      gadget.hideLoading();
+		      AJS.$.ajax({
+		      	url: args.issueslist.ajaxOptions,
+		      	type: "GET",
+		      	contentType: "text/html",
+		      	success: function(response) {
+		      	  AJS.log("Success");
+		      	  console.log("Gadget is ", gadget);
+		      	  minimsg.dismissMessage(loadMessage);
+		      	  AJS.$("#content_div").show().html(args.issueslist);
+		      	  resize();
+		      	},
+		      	error: function(response) {
+		      	  AJS.log("Error on service call - response code: " + response.rc);
+		      	  AJS.$("#content_div").show().html(exception);
+		      	  minimsg.dismissMessage(loadMessage);
+  				  resize();
+  				  //gadget.showMessage("error","popup dialog on error",true,true);
+		      	}
+	      	 });
+		    },
+		    args: [{
+		        key: "issueslist",
+		        ajaxOptions: function () {
+		          try {
+		          	this.getConfig().empty(); // clear existing form
+		          } catch(err) {
+		          }
+		     	  resize();
+     		      AJS.$("#content_div").show().html(null);
+		          this.showLoading();
+		          var prefs = new gadgets.Prefs(); 
+		          return {
+		            url: "__ATLASSIAN_BASE_URL__/plugins/servlet/vocvolume",
+		            data: {
+		              jqlQuery: "issuetype not in (\"VOC Request\",\"Support Request\")",
+		              //jqlQuery: prefs.getString(),
+		              jqlGadget: prefs.getString("text_jql"),
+		              noTotal: prefs.getString("no_total"),
+		              escapingOnly: prefs.getString("escaping_only"),
+		              sortTotal: prefs.getString("sort_total"),
+					  sortVOCWeightedVolume: prefs.getString("sort_voc_volume"),
+		              numIssuesLimit: prefs.getInt("num_issues_limit"),
+		              numResultsLimit: prefs.getInt("num_results_limit"),
+		            },
+		            contentType: "text/html",
+		            dataType: "html"
+		          }
+		        }
+		    }]
+		  }
+        });
+      })();
+          
+      function resize() {
+		gadgets.window.adjustHeight();
+	  }
+	  window.onload=resize();
+	  
+    </script>
+
+    <div id="content_div"></div>
+    
+    ]]>
+	</Content>
+</Module>

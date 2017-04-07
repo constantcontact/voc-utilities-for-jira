@@ -1,0 +1,243 @@
+<html>
+<head>
+    <title>Constant Contact Configuration</title>
+    <meta name="decorator" content="atl.admin" />
+    <!-- https://docs.atlassian.com/aui/latest/ -->
+    <!-- https://developer.atlassian.com/display/JIRADEV/Plugin+Tutorial+-+Writing+integration+tests+using+PageObjects -->
+</head>
+<body>
+
+<form id="config" action="vocvolume" method="post" class="aui">
+
+    <h2>VOC Volume Configuration</h2>
+    
+    ##<div class="aui-message">
+    <p>Voice Of the Customer (VOC) Volume is the aggregate collection of instances occurring in the field.</p>
+    ##</div>
+    
+    <h3>Scope</h3>
+    <p style="font-style:italic;">Set conditions of when the VOC Volume appears in linked issues.</p>
+
+	<fieldset class="group">
+	  <legend><span>VOC Volume</span></legend>
+	  <div class="checkbox">
+	    <input class="checkbox" type="checkbox" id="isVisible" name="isVisible" value="yes" 
+	    #if ($isVisible && $isVisible == "yes")
+		checked="yes"
+		#end
+	    />
+	    <label for="isVisible">Visible as web panel in linked issues</label>
+	  </div>
+	</fieldset>
+
+#if($issuetypesJQL)
+	<div id="issuetypesJQLlabel" class="field-group">
+		<label for="issuetypesJQL">VOC issuetypes JQL</label>
+		<textarea class="textarea long-field" name="issuetypesJQL" id="issuetypesJQL">$issuetypesJQL</textarea>
+		<div id="valid-issuetype-area">
+		#if($validIssueTypes)
+			#if($validIssueTypes == "yes")
+				#set($issueTypeSuccess="success")
+				#set($issueTypeColor="green")
+				#set($issueTypeMessage = "This JQL is valid.")
+			#else
+				#set($issueTypeSuccess="error")
+				#set($issueTypeColor="red")
+				
+				#if($validIssueTypes == "zero results")
+					#set($issueTypeMessage="Your search has zero results - VOC Panel may not display.")
+				#else
+					#set($issueTypeMessage="Invalid JQL Syntax - VOC Panel will not display.")
+				#end
+			#end
+
+			<span id="valid-issuetype-warning" class="aui-icon aui-icon-$issueTypeSuccess"></span>
+			<span style="color:$issueTypeColor;" id="is-issuetype-valid">$issueTypeMessage</span>
+		#end
+		</div>
+		<div class="description">Optional - JQL query to limit the issuetypes of linked issues with VOC Volume fields.</div>
+	</div>
+#end 
+    
+#if($jql)
+	<div id="JQLlabelDiv" class="field-group">
+		<label for="jql">Product Delivery JQL</label>
+		<textarea class="textarea long-field" name="jql" id="jql">$jql</textarea>
+		<div id="valid-jql-area">
+		#if($validJql)
+			#if($validJql == "yes")
+				#set($jqlSuccess="success")
+				#set($jqlColor="green")
+				#set($jqlMessage = "This JQL is valid.")
+			#else
+				#set($jqlSuccess="error")
+				#set($jqlColor="red")
+				
+				#if($validJql == "zero results")
+					#set($jqlMessage="Your search has zero results - VOC Panel will not display.")
+				#else
+					#set($jqlMessage="Invalid JQL Syntax - VOC Panel will not display.")
+				#end
+			#end
+
+			<span class="aui-icon aui-icon-$jqlSuccess"></span>
+			<span style="color:$jqlColor;" id="is-jql-valid">$jqlMessage</span>
+		#end
+		</div>
+		<div class="description">Optional - JQL query to limit the scope of linked issues to apply VOC Volume.</div>
+	</div>
+#end 
+
+	<h3>Custom Fields</h3>
+	<p style="font-style:italic;">If any of the selected custom fields have values then they will be listed under the VOC Volume banner.</p>
+
+	<fieldset class="group">
+	  <legend><span>Counts</span></legend>
+	  <div>
+		<span><b>Uservoice (Number Field):</b> From the Uservoice Request escalation</span><br/>
+#if($cfUservoice.contains("success"))
+		<span class="aui-icon aui-icon-success"></span>   
+	    <span style="color:green;">The "<b>Uservoice</b>" custom field is present.</span>
+#else
+		<span class="aui-icon aui-icon-error"></span>
+	    <span style="color:red;">The "<b>Uservoice</b>" custom field is not present.</span>
+#end
+	</div>
+	<div>
+		<span><b>Support Tracks (Number Field):</b> Support Request escalation</span><br/>
+#if($cfSupportTracks.contains("success"))
+		<span class="aui-icon aui-icon-success"></span>
+	    <span style="color:green;">The "<b>Support Tracks</b>" custom field is present.</span>
+#else
+		<span class="aui-icon aui-icon-error"></span>
+	    <span style="color:red;">The "<b>Support Tracks</b>" custom field is not present.</span>
+#end
+	<div>
+		<span><b>Stand-ups (Number Field):</b> Internal verbal escalation</span><br/>
+#if($cfStand-ups.contains("success"))
+		<span class="aui-icon aui-icon-success"></span>   
+	    <span style="color:green;">The "<b>Stand-ups</b>" custom field is present.</span>
+#else
+		<span class="aui-icon aui-icon-error"></span>
+	    <span style="color:red;">The "<b>Stand-ups</b>" custom field is not present.</span>
+#end
+	<div>
+		<span><b>Feedback Forums (Number Field):</b> Interactive customer feedback in-product</span><br/>
+#if($cfFeedbackforums.contains("success"))
+		<span class="aui-icon aui-icon-success"></span>   
+	    <span style="color:green;">The "<b>Feedback Forums</b>" custom field is present.</span>
+#else
+		<span class="aui-icon aui-icon-error"></span>
+	    <span style="color:red;">The "<b>Feedback Forums</b>" custom field is not present.</span>
+#end
+	<div>
+		<span><b>Salesforce (Number Field):</b> Tracked sales leads resulting in support activity</span><br/>
+#if($cfSalesforce.contains("success"))
+		<span class="aui-icon aui-icon-success"></span>   
+	    <span style="color:green;">The "<b>Salesforce</b>" custom field is present.</span>
+#else
+		<span class="aui-icon aui-icon-error"></span>
+	    <span style="color:red;">The "<b>Salesforce</b>" custom field is not present.</span>
+#end
+	<div>
+		<span><b>VOC Volume Other Value (Number Field):</b> Other sources</span><br/>
+#if($cfVOCVolumeOtherValue.contains("success"))
+		<span class="aui-icon aui-icon-success"></span>   
+	    <span style="color:green;">The "<b>VOC Volume Other Value</b>" custom field is present.</span>
+#else
+		<span class="aui-icon aui-icon-error"></span>
+	    <span style="color:red;">The "<b>VOC Volume Other Value</b>" custom field is not present.</span>
+#end
+	</div>
+
+	</fieldset>
+	
+	<fieldset class="group">
+	  <legend><span>Guidance Level</span></legend>
+	  <div>
+	  <span><b>VOC Volume (Select List):</b> The volume level prompting customers to contact us.</span>
+#if($cfVOCVolume)
+	  	<div><b>Actual Options:</b> $cfVOCVolume</div>  ## None, Low, Medium, High
+#end
+	  </div>
+#if($cfVOCVolume)
+		<span class="aui-icon aui-icon-success"></span>   
+	    <span style="color:green;">The "<b>VOC Volume</b>" custom field is present.</span>
+#else
+		<span class="aui-icon aui-icon-error"></span>
+	    <span style="color:red;">The "<b>VOC Volume</b>" custom field is not present.</span>
+#end
+  	</fieldset>
+
+	<h3>Banner Labels</h3>
+	<p style="font-style:italic;">Change the text in the VOC Volume banner or clear the field for default test.</p>
+
+    <div id="BannerLabelDiv" class="field-group">
+        <label for="highGuidance">High</label>
+        <input id="highGuidance" type="text" class="text" name="highGuidance" value="$highGuidance" width="42" size="42"/>        
+        <img src="$baseUrl/images/icons/priority_critical.gif" alt="Very High Impact" />
+        <span style="font-weight: bold; color: white; background-color:darkred; padding:5px; margin-top:5px">
+    		$highGuidance ## Many customers have reported.
+		</span>
+		<div class="description">Default: $highGuidanceDefault</div>
+    </div>
+    
+    <div id="BannerLabelDiv" class="field-group">
+        <label for="medGuidance">Medium</label>
+        <input id="medGuidance" type="text" class="text" name="medGuidance" value="$medGuidance" width="42" size="42"/>
+        <img src="$baseUrl/images/icons/priority_major.gif" alt="High Impact" />
+        <span style="font-weight: bold; color: white; background-color:orange; padding:5px; margin-top:5px">
+        	$medGuidance ## Several customers have reported.
+		</span>
+		<div class="description">Default: $medGuidanceDefault</div>
+    </div>
+    
+    <div id="BannerLabelDiv" class="field-group">
+        <label for="lowGuidance">Low</label>
+        <input id="lowGuidance" type="text" class="text" name="lowGuidance" value="$lowGuidance" width="42" size="42"/>
+        <img src="$baseUrl/images/icons/priority_minor.gif" alt="Low Impact" />
+        <span style="font-weight: bold; color: white; background-color:green; padding:5px; margin-top:5px">
+    		$lowGuidance ## A few customers have reported.
+		</span>
+		<div class="description">Default: $lowGuidanceDefault</div>
+    </div>
+    
+    <h3>VOC Severity</h3>
+	  <p style="font-style:italic;">The VOC Severity field is the yardstick of impact to the customer.</p>
+  	
+  	<fieldset class="group">
+	  <legend><span>VOC Severity Level</span></legend>
+	  <div>
+	  <span><b>VOC Severity (Select List):</b> The customer impact level expressed by the customer.</span>
+#if($cfSeverity)
+	  	<div><b>Actual Options:</b> $cfSeverity</div>  ## Unusable, Painful, Annoying, Polish, Enhancement
+#end
+	  </div>
+#if($cfSeverity)
+		<span class="aui-icon aui-icon-success"></span>   
+	    <span style="color:green;">The "<b>VOC Severity</b>" custom field is present.</span>
+#else
+		<span class="aui-icon aui-icon-error"></span>
+	    <span style="color:red;">The "<b>VOC Severity</b>" custom field is not present.</span>
+	    <div class="checkbox">
+    		<input class="checkbox" type="checkbox" name="createSeverity" id="createSeverity" value="yes" 
+		    #if ($createSeverity && $createSeverity == "yes")
+			checked="yes"
+			#end
+		    />
+    		<label for="createSeverity">Create Severity field if not present.</label>
+		</div>
+#end
+  	</fieldset>
+
+    <br/>
+    <div class="buttons-container">
+        <div class="buttons">
+            <input class="aui-button aui-button-primary" type="submit" value="Save" name="Save"/>
+            <a class="cancel" href="#">Cancel</a>
+        </div>
+    </div>
+</form>
+
+</body>
+</html>

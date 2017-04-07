@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html xmlns:xlink="http://www.w3.org/1999/xlink">
+<meta charset="utf-8">
+<style>
+
+body {
+  font: 10px sans-serif;
+  background: #FFFFFF;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+.chart {
+  float: left;
+}
+.chart2 {
+  float: left;
+}
+
+.line {
+  fill: none;
+  stroke: black;
+  stroke-width: 1.5px;
+}
+.lineUp {
+  fill: none;
+  stroke: red;
+  stroke-width: 1.5px;
+}
+.lineDown {
+  fill: none;
+  stroke: green;
+  stroke-width: 1.5px;
+}
+.regressionLine {
+  fill: none;
+  stroke: red;
+  stroke-width: 1.5px;
+}
+.chartTitle {
+  text-wrap: normal;
+  font-size: 14px;
+  display: inline-block;
+  width: $w;
+  text-align: center;
+}
+div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: 60px;
+  height: 34px;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: lightsteelblue;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
+}
+</style>
+<body>
+   #disable_html_escaping()
+<!--
+timings: $time
+projects = $p
+regular = $cfData
+business critical = $bcData
+LOG===
+$log
+-->
+<div>
+
+<div style="width:$wbc;float:left;padding: 0px 10px;">
+<br><div><span class=chartTitle>$bcTitle</span></div><br>
+<svg class="chart2"></svg>
+</div>
+
+<div style="width:$wcf;float:left;padding: 0px 10px;">
+<br><div><span class=chartTitle>$cfTitle</span></div><br>
+<svg class="chart"></svg>
+</div>
+
+</div>
+
+<script>
+var latestUrl = "$refreshUrl";
+var whichCharts = "$whichCharts";
+var w = $w;
+var h = $h;
+var trendHeight = $trendHeight;
+var businessCriticalData = $bcData;
+var customerFacingData = $cfData;
+var fontSize = "11";
+var averageFoundBc = $averageFoundtrue;
+var averageFoundCf = $averageFoundfalse;
+var lastMonthPercentDone = $lastMonthPercentDone;
+var useHardCodedData = $hc;
+if (useHardCodedData) {
+  customerFacingData = [{"total":7,"linkBoth":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2014-01-31 AND createdDate <= 2014-01-31 AND project in (\"Mobile Apps\")  AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") ","month":"2014-01-31","defects":[{"color":"4C6C9C","y0":0,"name":"Escaping","y1":0,"url":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issue in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug) AND category in (\\\"Core Applications\\\", \\\"Internal Applications\\\") AND status was not Closed BEFORE 2014-01-31 AND createdDate <= 2014-01-31 AND project in (\\\"Mobile Apps\\\") \", \"Support Request\")"},{"color":"9DB1CF","y0":0,"name":"Cust Found","y1":0,"url":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2014-01-31 AND createdDate <= 2014-01-31 AND project in (\"Mobile Apps\")  AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") AND issue NOT in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug)\", \"Support Request\")"},{"color":"DFE5EF","y0":0,"name":"Cust Facing","y1":7,"url":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2014-01-31 AND createdDate <= 2014-01-31 AND project in (\"Mobile Apps\")  AND NOT issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") "},{"color":"white","y0":7,"name":"total","y1":32,"url":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2014-01-31 AND createdDate <= 2014-01-31 AND project in (\"Mobile Apps\") "}]},{"total":30,"linkBoth":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2014-02-28 AND createdDate <= 2014-02-28 AND project in (\"Mobile Apps\")  AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") ","month":"2014-02-28","defects":[{"color":"4C6C9C","y0":0,"name":"Escaping","y1":1,"url":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issue in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug) AND category in (\\\"Core Applications\\\", \\\"Internal Applications\\\") AND status was not Closed BEFORE 2014-02-28 AND createdDate <= 2014-02-28 AND project in (\\\"Mobile Apps\\\") \", \"Support Request\")"},{"color":"9DB1CF","y0":1,"name":"Cust Found","y1":1,"url":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2014-02-28 AND createdDate <= 2014-02-28 AND project in (\"Mobile Apps\")  AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") AND issue NOT in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug)\", \"Support Request\")"},{"color":"DFE5EF","y0":1,"name":"Cust Facing","y1":30,"url":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2014-02-28 AND createdDate <= 2014-02-28 AND project in (\"Mobile Apps\")  AND NOT issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") "},{"color":"white","y0":30,"name":"total","y1":55,"url":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2014-02-28 AND createdDate <= 2014-02-28 AND project in (\"Mobile Apps\") "}]},{"total":81,"linkBoth":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2014-03-31 AND createdDate <= 2014-03-31 AND project in (\"Mobile Apps\")  AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") ","month":"2014-03-31","defects":[{"color":"4C6C9C","y0":0,"name":"Escaping","y1":1,"url":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issue in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug) AND category in (\\\"Core Applications\\\", \\\"Internal Applications\\\") AND status was not Closed BEFORE 2014-03-31 AND createdDate <= 2014-03-31 AND project in (\\\"Mobile Apps\\\") \", \"Support Request\")"},{"color":"9DB1CF","y0":1,"name":"Cust Found","y1":1,"url":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2014-03-31 AND createdDate <= 2014-03-31 AND project in (\"Mobile Apps\")  AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") AND issue NOT in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug)\", \"Support Request\")"},{"color":"DFE5EF","y0":1,"name":"Cust Facing","y1":81,"url":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2014-03-31 AND createdDate <= 2014-03-31 AND project in (\"Mobile Apps\")  AND NOT issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") "},{"color":"white","y0":81,"name":"total","y1":106,"url":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2014-03-31 AND createdDate <= 2014-03-31 AND project in (\"Mobile Apps\") "}]},{"total":104,"linkBoth":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2014-04-30 AND createdDate <= 2014-04-30 AND project in (\"Mobile Apps\")  AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") ","month":"2014-04-30","defects":[{"color":"4C6C9C","y0":0,"name":"Escaping","y1":1,"url":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issue in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug) AND category in (\\\"Core Applications\\\", \\\"Internal Applications\\\") AND status was not Closed BEFORE 2014-04-30 AND createdDate <= 2014-04-30 AND project in (\\\"Mobile Apps\\\") \", \"Support Request\")"},{"color":"9DB1CF","y0":1,"name":"Cust Found","y1":1,"url":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2014-04-30 AND createdDate <= 2014-04-30 AND project in (\"Mobile Apps\")  AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") AND issue NOT in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug)\", \"Support Request\")"},{"color":"DFE5EF","y0":1,"name":"Cust Facing","y1":104,"url":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2014-04-30 AND createdDate <= 2014-04-30 AND project in (\"Mobile Apps\")  AND NOT issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") "},{"color":"white","y0":104,"name":"total","y1":129,"url":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2014-04-30 AND createdDate <= 2014-04-30 AND project in (\"Mobile Apps\") "}]},{"total":216,"linkBoth":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2014-05-31 AND createdDate <= 2014-05-31 AND project in (\"Mobile Apps\")  AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") ","month":"2014-05-31","defects":[{"color":"4C6C9C","y0":0,"name":"Escaping","y1":0,"url":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issue in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug) AND category in (\\\"Core Applications\\\", \\\"Internal Applications\\\") AND status was not Closed BEFORE 2014-05-31 AND createdDate <= 2014-05-31 AND project in (\\\"Mobile Apps\\\") \", \"Support Request\")"},{"color":"9DB1CF","y0":0,"name":"Cust Found","y1":0,"url":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2014-05-31 AND createdDate <= 2014-05-31 AND project in (\"Mobile Apps\")  AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") AND issue NOT in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug)\", \"Support Request\")"},{"color":"DFE5EF","y0":0,"name":"Cust Facing","y1":216,"url":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2014-05-31 AND createdDate <= 2014-05-31 AND project in (\"Mobile Apps\")  AND NOT issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") "},{"color":"white","y0":216,"name":"total","y1":241,"url":"https://jira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2014-05-31 AND createdDate <= 2014-05-31 AND project in (\"Mobile Apps\") "}]}];
+  businessCriticalData = [{"total":128,"linkBoth":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2012-10-31 AND createdDate <= 2012-10-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") ","month":"2012-10-31","defects":[{"color":"990099","y0":0,"name":"Escaping","y1":15,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issue in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug) AND category in (\\\"Core Applications\\\", \\\"Internal Applications\\\") AND status was not Closed BEFORE 2012-10-31 AND createdDate <= 2012-10-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))\", \"Support Request\")"},{"color":"FF66FF","y0":15,"name":"Cust Found","y1":19,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2012-10-31 AND createdDate <= 2012-10-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") AND issue NOT in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug)\", \"Support Request\") "},{"color":"FFCCFF","y0":19,"name":"Cust Facing","y1":128,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2012-10-31 AND createdDate <= 2012-10-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND NOT issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") "},{"color":"white","y0":128,"name":"total","y1":153,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2012-10-31 AND createdDate <= 2012-10-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))"}]},{"total":146,"linkBoth":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2012-11-30 AND createdDate <= 2012-11-30 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") ","month":"2012-11-30","defects":[{"color":"990099","y0":0,"name":"Escaping","y1":13,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issue in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug) AND category in (\\\"Core Applications\\\", \\\"Internal Applications\\\") AND status was not Closed BEFORE 2012-11-30 AND createdDate <= 2012-11-30 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))\", \"Support Request\")"},{"color":"FF66FF","y0":13,"name":"Cust Found","y1":17,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2012-11-30 AND createdDate <= 2012-11-30 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") AND issue NOT in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug)\", \"Support Request\") "},{"color":"FFCCFF","y0":17,"name":"Cust Facing","y1":146,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2012-11-30 AND createdDate <= 2012-11-30 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND NOT issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") "},{"color":"white","y0":146,"name":"total","y1":171,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2012-11-30 AND createdDate <= 2012-11-30 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))"}]},{"total":161,"linkBoth":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2012-12-31 AND createdDate <= 2012-12-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") ","month":"2012-12-31","defects":[{"color":"990099","y0":0,"name":"Escaping","y1":13,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issue in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug) AND category in (\\\"Core Applications\\\", \\\"Internal Applications\\\") AND status was not Closed BEFORE 2012-12-31 AND createdDate <= 2012-12-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))\", \"Support Request\")"},{"color":"FF66FF","y0":13,"name":"Cust Found","y1":17,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2012-12-31 AND createdDate <= 2012-12-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") AND issue NOT in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug)\", \"Support Request\") "},{"color":"FFCCFF","y0":17,"name":"Cust Facing","y1":161,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2012-12-31 AND createdDate <= 2012-12-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND NOT issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") "},{"color":"white","y0":161,"name":"total","y1":186,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2012-12-31 AND createdDate <= 2012-12-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))"}]},{"total":182,"linkBoth":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-01-31 AND createdDate <= 2013-01-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") ","month":"2013-01-31","defects":[{"color":"990099","y0":0,"name":"Escaping","y1":15,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issue in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug) AND category in (\\\"Core Applications\\\", \\\"Internal Applications\\\") AND status was not Closed BEFORE 2013-01-31 AND createdDate <= 2013-01-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))\", \"Support Request\")"},{"color":"FF66FF","y0":15,"name":"Cust Found","y1":19,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-01-31 AND createdDate <= 2013-01-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") AND issue NOT in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug)\", \"Support Request\") "},{"color":"FFCCFF","y0":19,"name":"Cust Facing","y1":182,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-01-31 AND createdDate <= 2013-01-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND NOT issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") "},{"color":"white","y0":182,"name":"total","y1":207,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-01-31 AND createdDate <= 2013-01-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))"}]},{"total":217,"linkBoth":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-02-28 AND createdDate <= 2013-02-28 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") ","month":"2013-02-28","defects":[{"color":"990099","y0":0,"name":"Escaping","y1":12,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issue in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug) AND category in (\\\"Core Applications\\\", \\\"Internal Applications\\\") AND status was not Closed BEFORE 2013-02-28 AND createdDate <= 2013-02-28 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))\", \"Support Request\")"},{"color":"FF66FF","y0":12,"name":"Cust Found","y1":17,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-02-28 AND createdDate <= 2013-02-28 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") AND issue NOT in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug)\", \"Support Request\") "},{"color":"FFCCFF","y0":17,"name":"Cust Facing","y1":217,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-02-28 AND createdDate <= 2013-02-28 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND NOT issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") "},{"color":"white","y0":217,"name":"total","y1":242,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-02-28 AND createdDate <= 2013-02-28 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))"}]},{"total":224,"linkBoth":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-03-31 AND createdDate <= 2013-03-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") ","month":"2013-03-31","defects":[{"color":"990099","y0":0,"name":"Escaping","y1":11,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issue in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug) AND category in (\\\"Core Applications\\\", \\\"Internal Applications\\\") AND status was not Closed BEFORE 2013-03-31 AND createdDate <= 2013-03-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))\", \"Support Request\")"},{"color":"FF66FF","y0":11,"name":"Cust Found","y1":17,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-03-31 AND createdDate <= 2013-03-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") AND issue NOT in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug)\", \"Support Request\") "},{"color":"FFCCFF","y0":17,"name":"Cust Facing","y1":224,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-03-31 AND createdDate <= 2013-03-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND NOT issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") "},{"color":"white","y0":224,"name":"total","y1":249,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-03-31 AND createdDate <= 2013-03-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))"}]},{"total":183,"linkBoth":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-04-30 AND createdDate <= 2013-04-30 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") ","month":"2013-04-30","defects":[{"color":"990099","y0":0,"name":"Escaping","y1":11,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issue in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug) AND category in (\\\"Core Applications\\\", \\\"Internal Applications\\\") AND status was not Closed BEFORE 2013-04-30 AND createdDate <= 2013-04-30 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))\", \"Support Request\")"},{"color":"FF66FF","y0":11,"name":"Cust Found","y1":17,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-04-30 AND createdDate <= 2013-04-30 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") AND issue NOT in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug)\", \"Support Request\") "},{"color":"FFCCFF","y0":17,"name":"Cust Facing","y1":183,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-04-30 AND createdDate <= 2013-04-30 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND NOT issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") "},{"color":"white","y0":183,"name":"total","y1":208,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-04-30 AND createdDate <= 2013-04-30 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))"}]},{"total":225,"linkBoth":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-05-31 AND createdDate <= 2013-05-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") ","month":"2013-05-31","defects":[{"color":"990099","y0":0,"name":"Escaping","y1":15,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issue in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug) AND category in (\\\"Core Applications\\\", \\\"Internal Applications\\\") AND status was not Closed BEFORE 2013-05-31 AND createdDate <= 2013-05-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))\", \"Support Request\")"},{"color":"FF66FF","y0":15,"name":"Cust Found","y1":26,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-05-31 AND createdDate <= 2013-05-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") AND issue NOT in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug)\", \"Support Request\") "},{"color":"FFCCFF","y0":26,"name":"Cust Facing","y1":225,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-05-31 AND createdDate <= 2013-05-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND NOT issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") "},{"color":"white","y0":225,"name":"total","y1":250,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-05-31 AND createdDate <= 2013-05-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))"}]},{"total":243,"linkBoth":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-06-30 AND createdDate <= 2013-06-30 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") ","month":"2013-06-30","defects":[{"color":"990099","y0":0,"name":"Escaping","y1":12,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issue in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug) AND category in (\\\"Core Applications\\\", \\\"Internal Applications\\\") AND status was not Closed BEFORE 2013-06-30 AND createdDate <= 2013-06-30 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))\", \"Support Request\")"},{"color":"FF66FF","y0":12,"name":"Cust Found","y1":21,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-06-30 AND createdDate <= 2013-06-30 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") AND issue NOT in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug)\", \"Support Request\") "},{"color":"FFCCFF","y0":21,"name":"Cust Facing","y1":243,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-06-30 AND createdDate <= 2013-06-30 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND NOT issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") "},{"color":"white","y0":243,"name":"total","y1":268,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-06-30 AND createdDate <= 2013-06-30 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))"}]},{"total":254,"linkBoth":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-07-31 AND createdDate <= 2013-07-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") ","month":"2013-07-31","defects":[{"color":"990099","y0":0,"name":"Escaping","y1":21,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issue in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug) AND category in (\\\"Core Applications\\\", \\\"Internal Applications\\\") AND status was not Closed BEFORE 2013-07-31 AND createdDate <= 2013-07-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))\", \"Support Request\")"},{"color":"FF66FF","y0":21,"name":"Cust Found","y1":31,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-07-31 AND createdDate <= 2013-07-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") AND issue NOT in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug)\", \"Support Request\") "},{"color":"FFCCFF","y0":31,"name":"Cust Facing","y1":254,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-07-31 AND createdDate <= 2013-07-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND NOT issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") "},{"color":"white","y0":254,"name":"total","y1":279,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-07-31 AND createdDate <= 2013-07-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))"}]},{"total":287,"linkBoth":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-08-31 AND createdDate <= 2013-08-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") ","month":"2013-08-31","defects":[{"color":"990099","y0":0,"name":"Escaping","y1":18,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issue in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug) AND category in (\\\"Core Applications\\\", \\\"Internal Applications\\\") AND status was not Closed BEFORE 2013-08-31 AND createdDate <= 2013-08-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))\", \"Support Request\")"},{"color":"FF66FF","y0":18,"name":"Cust Found","y1":30,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-08-31 AND createdDate <= 2013-08-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") AND issue NOT in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug)\", \"Support Request\") "},{"color":"FFCCFF","y0":30,"name":"Cust Facing","y1":287,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-08-31 AND createdDate <= 2013-08-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND NOT issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") "},{"color":"white","y0":287,"name":"total","y1":312,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-08-31 AND createdDate <= 2013-08-31 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))"}]},{"total":304,"linkBoth":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-09-30 AND createdDate <= 2013-09-30 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") ","month":"2013-09-30","defects":[{"color":"990099","y0":0,"name":"Escaping","y1":30,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issue in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug) AND category in (\\\"Core Applications\\\", \\\"Internal Applications\\\") AND status was not Closed BEFORE 2013-09-30 AND createdDate <= 2013-09-30 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))\", \"Support Request\")"},{"color":"FF66FF","y0":30,"name":"Cust Found","y1":44,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-09-30 AND createdDate <= 2013-09-30 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") AND issue NOT in linkedCreatedBeforeQuery(\"issuetype in (Defect, Bug)\", \"Support Request\") "},{"color":"FFCCFF","y0":44,"name":"Cust Facing","y1":304,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-09-30 AND createdDate <= 2013-09-30 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying)) AND NOT issue in linkedIssuesFromQuery(\"issuetype in (\\\"Support Request\\\")\") "},{"color":"white","y0":304,"name":"total","y1":329,"url":"https://devjira.roving.com/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=issuetype in (Defect, Bug) AND category in (\"Core Applications\", \"Internal Applications\") AND status was not Closed BEFORE 2013-09-30 AND createdDate <= 2013-09-30 AND (priority in (Blocker,Critical,High) AND Severity in (Unusable,Painful,Annoying))"}]}]
+  var averageFoundBc = 5;
+  var averageFoundCf = 10;
+  lastMonthPercentDone = 0.3;
+}  
+var businessCriticalTitle = "$bcTitle";
+var customerFacingTitle = "$cfTitle";
+var cfColors = $cfColors;
+var bcColors = $bcColors;
+/*
+function textWidth(text) {
+ return text.length > 11 ? text.length * 6 : text.length * 5.5;
+}
+*/
+//------------------------------------------------------------------------
+function createDefectChart(data,w,h,trendHeight,svgSelector,title,colors,averageFound,latestUrl) {
+var div = d3.select("body").append("div")   
+    .attr("class", "tooltip")               
+    .style("opacity", 0);
+    
+var lr = linearRegression.get(
+			data,
+			function(datum) { return datum.defects[1].y1; },
+			lastMonthPercentDone);
+linearRegression.updateDataWithIt(data,lr);
+
+var min_t = 1000000;
+var max_t = -1;
+for (var i=0;i<data.length;i++) {
+  var n = data[i].defects[1].y1;
+  if (n < min_t) {
+    min_t = n;
+  }
+  if (n > max_t) {
+    max_t = n;
+  }
+}
+if (data[0]["regression"] < min_t) {
+    min_t = data[0]["regression"];
+}
+if (data[data.length-1]["regression"] < min_t) {
+    min_t = data[data.length-1]["regression"];
+}
+if (data[0]["regression"] > max_t) {
+    max_t = data[0]["regression"];
+}
+if (data[data.length-1]["regression"] > max_t) {
+    max_t = data[data.length-1]["regression"];
+}
+
+var margin = {top: 60, right: 20, bottom: 60, left: 58, trend: trendHeight},
+    width = w - margin.left - margin.right,
+    height = h - margin.top - margin.bottom - margin.trend;
+
+var x = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .1);
+
+var y = d3.scale.linear()
+    .rangeRound([height, 0]);
+
+var trendy = d3.scale.linear()
+	.domain([min_t,max_t])
+	.range([0,margin.trend]);
+
+var linearRegressionOpacity = 0.30;
+    
+var color = d3.scale.ordinal()
+    .domain(["Escaping", "Eng & Cust Found", "Cust Facing"])
+    .range(colors);
+var r2 = isNaN(lr.r2) ? 1 : lr.r2.toFixed(2);
+ var m  = lr.slope.toFixed(1);
+ var m_msg = "default";
+ var trendColor = "black";
+ if (m>0) {
+  m_msg = "+" + m;
+  trendColor = "red";
+ } else if (m<0) {
+  m_msg = "" + m;
+  trendColor = "green";
+ } else {
+  m_msg = "+0";
+  trendColor = "green";
+ }
+
+ var lineLegend = d3.scale.ordinal()
+    .domain(["Cust Found Total"])
+    .range(["black"]);
+
+var parseDate = d3.time.format("%Y-%m-%d").parse;
+var formatMonth = d3.time.format("%b");
+var formatYear = d3.time.format("%Y");
+    
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .tickFormat(function(d) {
+      var date = parseDate(d);
+      return "Jan" == formatMonth(date)
+        ? formatYear(date)
+        : formatMonth(date);
+    });
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickFormat(d3.format("d"));
+
+var svg = d3.select(svgSelector)
+    .style("width", width + margin.left + margin.right)
+    .style("height", height + margin.top + margin.bottom + margin.trend)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + (margin.top + margin.trend) + ")");
+
+  x.domain(data.map(function(d) { return d.month; }));
+  y.domain([0, d3.max(data, function(d) { return d.total; })]);
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+        .selectAll("text")  
+		.style("text-anchor", "middle")
+        .style("font-size", fontSize-2);
+
+  // year on the left if the first month is not January 
+  if (formatMonth(parseDate(data[0].month)) != "Jan") {
+    svg.append("text")
+      .attr("x", 0)// width+margin.right)
+      .attr("y", height+12)
+      .attr("dy", ".35em")
+      .style("font-size", fontSize-2)
+      .style("text-anchor", "end")
+      .style("fill", "black")
+      .text(formatYear(parseDate(data[0].month)));
+  }      
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis);
+
+  var month = svg.selectAll(".month")
+      .data(data)
+    .enter().append("g")
+      .attr("class", "g")
+      .style("text-anchor", "middle")
+      .attr("transform", function(d) { return "translate(" + x(d.month) + ",0)"; });
+      
+  month.selectAll("rect")
+      .data(function(d) { return d.defects; })
+    .enter()
+      .append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", function(d){return d.url;}) 
+      .append("rect")
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.y1); })
+      .attr("height", function(d) { return d.color == "white" ? 0 : y(d.y0) - y(d.y1); })
+      .attr("opacity", function(d) { return d.color == "white" ? 0 : 1; })
+      .style("fill", function(d) { return d.color; });
+  
+  month.selectAll("text")
+      .data(function(d) { return d.defects; })
+    .enter()
+      .append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", function(d){return d.url;})
+      .append("text")
+      .attr("text-anchor", "middle")
+      .attr("x", x.rangeBand() / 2)
+      .attr("y", function(d, i) { return i<3 ? (y(d.y0) + y(d.y1)) / 2 : y(d.y0) - 6; })
+	  .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .style("font-weight", function(d) { return d.name=="total" ? "bold" : ""; })
+	  .attr("fill", function(d) {
+  	  	return d.color=="#DFE5EF" || d.color=="white" || d.color=="#FFCCFF" ? "black" : "white"; 
+	  })
+	  .text(function(d) { 
+	     if (d.name == "total") {
+	        return d.y0 == 0 ? "" : d.y0;
+	     } else {
+	       var val = d.y1 - d.y0;
+	       return val == 0 ? "" : val;
+	     }
+	  });
+  // reference thumbnail numbers
+  var iconSize = 13; // trendHeight minimum in Charts.java affected by this
+  var xshift = -10;
+  var refSize = iconSize*2.5;// trendHeight minimum in Charts.java affected by this
+  var refAxisStroke= 0.9;
+  var refGridStroke = 0.25;
+  var refStroke = 1;
+  var y0 = -refSize;
+  var pcmsg_y = y0-refSize;
+  var graphColor = "#8899FF";
+  var gridSpace = refSize / 6.0;
+  var percentChange = averageFound > 0 ? lr.slope/averageFound : 0;
+  if ("NaN"==""+percentChange) {
+    percentChange=0;
+  }
+  var half = refSize/2.0;
+  var pc = percentChange*100;
+  var pcsign = pc >= 0 ? "+" : "-";
+  var pcmsg = pcsign + pc.toFixed(1) + "%"; 
+  var tooltip = 0.6; // helps tooltips take two lines
+  var tooltipFont = "12px sans-serif"; // for computing the width of a tooltip
+  ////////////////////////////////////////   
+  // Legend for cust found total sparkline
+  ////////////////////////////////////////   
+  var topLegend_yShift = 30;
+  var spaceForSquares = 0;
+  var topLegendShiftX = 15;
+  var topLegendSize = 10;
+  var shiftForCustFoundTotalLine = iconSize + 4;
+  svg.append("rect")
+      .attr("x", topLegendShiftX)
+      .attr("y", -topLegend_yShift-1)
+      .attr("width", iconSize)
+      .attr("height", "1.5")
+      .style("fill", "black");
+  svg.append("text")
+      .attr("x", topLegendShiftX + shiftForCustFoundTotalLine)
+      .attr("y", -topLegend_yShift)
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .text("Cust Found =");
+  svg.append("rect")
+      .attr("x", topLegendShiftX + shiftForCustFoundTotalLine + 70)
+      .attr("y", -topLegend_yShift-5)
+      .attr("width", topLegendSize)
+      .attr("height", topLegendSize)
+      .attr("opacity", function(d,i) { return i>0 ? linearRegressionOpacity : 1; })
+      .style("fill", color.range()[0]);
+  svg.append("text")
+      .attr("x", topLegendShiftX + shiftForCustFoundTotalLine + 82)
+      .attr("y", -topLegend_yShift)
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .text("Esc + ");
+  svg.append("rect")
+      .attr("x", topLegendShiftX + shiftForCustFoundTotalLine + 114)
+      .attr("y", -topLegend_yShift-5)
+      .attr("width", topLegendSize)
+      .attr("height", topLegendSize)
+      .attr("opacity", function(d,i) { return i>0 ? linearRegressionOpacity : 1; })
+      .style("fill", color.range()[1]);
+  svg.append("text")
+      .attr("x", topLegendShiftX + shiftForCustFoundTotalLine + 127)
+      .attr("y", -topLegend_yShift)
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .text("Eng & Cust Found");
+
+  ////////////////////////////////////////   
+  // Legend for bottom bar chart
+  ////////////////////////////////////////   
+  var legendSpacing = 3;
+  var textSpaceUsed = 0;
+  var legend = svg.selectAll(".legend")
+      .data(color.domain().slice())
+    .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) {
+         var distance = textSpaceUsed;
+         textSpaceUsed += iconSize + jQuery.fn.textWidth(d) + legendSpacing + 22;  
+         return "translate(" + distance + "," + (height + 25) +")"; 
+       }); 
+  
+  legend.append("rect")
+      .attr("x", 0)
+      .attr("y", 2)
+      .attr("width", iconSize)
+      .attr("height", iconSize)
+      .style("fill", color);
+
+  legend.append("text")
+      .attr("x", iconSize+legendSpacing)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      //.style("text-anchor", "end")
+      .style("font-size", fontSize)
+      .text(function(d) { return d; });
+
+  // get latest link in lower left corner
+  svg.append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", latestUrl)
+      .append("text")
+      .attr("x", 3-margin.left)
+      .attr("y", height+55)
+      .style("font-size", fontSize-2)
+      .style("fill", "blue")
+      .text("Get latest.")          
+	  .on("mouseover", function(d) {      
+            div.transition()        
+               .duration(200)      
+               .style("opacity", .9);      
+            div.html("Opens new window/tab with the latest data. Also updates cache.")  
+               .style("left", (d3.event.pageX) + "px")     
+               .style("top", (d3.event.pageY - 28) + "px")
+               .style("width", jQuery.fn.textWidth("Opens new window/tab with the latest data. Also updates cache.") + "px");    
+            })                  
+      .on("mouseout", function(d) {       
+            div.transition()        
+                .duration(500)      
+                .style("opacity", 0);   
+      });
+      
+  // Rendered timestamp      
+  svg.append("text")
+      .attr("x", 3-margin.left+jQuery.fn.textWidth("(Get latest)"))
+      .attr("y", height+55)
+      .style("font-size", fontSize-2)
+      .style("fill", "gray")
+      .text("Rendered:" + new Date())
+	  .on("mouseover", function(d) {      
+            div.transition()        
+               .duration(200)      
+               .style("opacity", .9);      
+            div.html("When this was rendered. Cached items can be from earlier in the same day.")  
+               .style("left", (d3.event.pageX) + "px")     
+               .style("top", (d3.event.pageY - 28) + "px")
+               .style("width", jQuery.fn.textWidth("When this was rendered. Cached items can be from earlier in the same day.") + "px");    
+            })                  
+      .on("mouseout", function(d) {       
+            div.transition()        
+                .duration(500)      
+                .style("opacity", 0);   
+      });
+
+  var topLegendHeight = 59;
+  var dropForValues = 49;
+
+  // linear regression line
+  var regressionLine = d3.svg.line()
+       .x(function(d) { return x(d.month) + (x.rangeBand() / 2); })
+       .y(function(d) { return -(topLegendHeight+trendy(d.regression)); });
+    
+  svg.append("path")
+       .datum(data)
+       .attr("class","regressionLine")
+       .style("stroke", trendColor)
+       .attr("stroke-width", 1)
+       //.style("stroke-dasharray", ("3, 3"))
+       .attr("opacity", linearRegressionOpacity)
+       .attr("d",regressionLine);
+  
+  // g for every month in the trend    
+  var trend = svg.selectAll(".trend")
+      .data(data)
+    .enter().append("g")
+      .attr("class", "trend")
+      .attr("transform", function(d) { return "translate(" + x(d.month) + "," + (-topLegendHeight) + ")"; });
+  
+  // trend numbers    
+  trend.append("svg:a")
+      .attr("target", "_blank")
+      .attr("xlink:href", function(d){return d.linkBoth;})
+      .append("text")
+      .attr("x", x.rangeBand()/2)
+      .attr("y", function(d) { return topLegendHeight-dropForValues-trendy(d.defects[1].y1); })
+      .attr("dy", ".35em")
+      .style("font-size", fontSize)
+      .attr("text-anchor", "middle")
+      .text(function(d) { return d.defects[1].y1; });
+  
+  // trend sparkline    
+  var line = d3.svg.line()
+    .x(function(d) { return x(d.month) + (x.rangeBand() / 2); })
+    .y(function(d) { return -(topLegendHeight+trendy(d.defects[1].y1)); });
+  
+    svg.append("path")
+       .datum(data)
+       .attr("class","line")
+       .attr("d",line);
+  var regressionDash = "12, 2";
+  var lineHeight = 10;
+  //////////////////////////////////
+  // MoM reference thumbnail
+  //////////////////////////////////
+  monthOverMonth.draw(
+  		lineHeight,margin,lr,svgSelector,regressionDash,trendColor,m_msg,r2,div,tooltip,tooltipFont,
+  		"Cust Found",
+  		"Total defects found by customers first plus those found by both Eng. and customers",
+  		averageFound);
+  }
+if ("both" == whichCharts || "cf" == whichCharts) {       
+  createDefectChart(customerFacingData,w,h,trendHeight,".chart",customerFacingTitle,cfColors,averageFoundCf,latestUrl);
+}       
+if ("both" == whichCharts || "bc" == whichCharts) {       
+  createDefectChart(businessCriticalData,w,h,trendHeight,".chart2",businessCriticalTitle,bcColors,averageFoundBc,latestUrl);
+}
+</script>
+</body>
+</html>

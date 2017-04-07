@@ -1,37 +1,29 @@
-## Welcome to GitHub Pages
+voc-utilities-for-jira
+=======================
 
-You can use the [editor on GitHub](https://github.com/constantcontact/voc-utilities-for-jira/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+## Jira 6.x plugin
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+VOC Utilities plugin for Jira 6.x is a collection of features specific to the Voice Of Customer (VoC) and Escaping Defect Management.
 
-### Markdown
+### Modules
+1. "VOC Priority Field Validator" constrains the transition if the issue is one of {Bug, Defect} issue types and requires the Priority field to not be the value "None".
+2. "VOC Severity Field Validator" constrains the transition if the issue is one of {Bug, Defect} issue types and requires the Severity field to not be null ("None").
+3. "VOC Issue Guidance Web Panel" adds a web panel in the right pane of the issue view screen, if there is a value to render.
+https://wiki.roving.com/display/EngDev/Jira+Defect+Instructions
+4. "VOC Mail Send Post Function" enables a transition to send email with custom body and a footer showing the transition and a link back to the issue.
+https://wiki.roving.com/display/EngDev/Jira+Email+Send+for+Workflow+Transitions
+5. "VOC Volume Web Panel" adds a web panel in the right pane of the issue view screen, if there are linked "VOC Volume" or "Support Request" tickets.
+https://wiki.roving.com/display/SalesSupport/VOC+Volume+Guidance
+6. "VOC Volume Gadget" adds a Dashboard Gadget that lists
+7. "Linked Issuetype Created Before" adds JQL function linkedCreatedBefore("","") for escaping defect queries. See also linkedCreatedBeforeQuery("","")
+8. "Charts" D3JS charts for dashboards
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+## Build History
+## version 3.0.0
+<ol>
+  <li>Initial Open Source Release</li>
+</ol>
 
-```markdown
-Syntax highlighted code block
+### Project Setup
+Contributor setup [here](https://wiki.roving.com/display/EngDev/Jira+Greenhopper#JiraGreenhopper-CTCTUtilityPlugin). Remote debugging setup instructions here: https://developer.atlassian.com/display/DOCS/Creating+a+Remote+Debug+Target.
 
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/constantcontact/voc-utilities-for-jira/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.

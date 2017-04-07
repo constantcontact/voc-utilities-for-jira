@@ -1,0 +1,44 @@
+<html>
+<head>
+    <title>VOC Volume Issues</title>
+    <!-- <meta name="decorator" content="atl.popup"> -->
+</head>
+<body id="page-type-blank">
+  <div id="content-container">
+    <div id="content-body">
+    	#if($issuesRows.size()==0)<h1>You've Got <span style="color:red">NO</span> Issues!</h1>#end
+
+        #if($errors)
+	        #if($errors.size()>0)
+	            <div class="aui-message error shadowed">
+	                #foreach($error in $errors)
+	                    <p class="title">
+	                        <span class="aui-icon icon-error"></span>
+	                        <strong>$error</strong>
+	                    </p>
+	                #end
+	            </div>
+	            <!-- .aui-message -->
+	        #end
+        #end
+        #disable_html_escaping()
+        $listHeading
+        #if($issueRows)
+	        #if($issueRows.size() > 0)
+	            <div id="issues" class="issues">
+		            #foreach($row in $issueRows)
+		                $row
+		                ##document.getElementById('rownum').innerHTML = $velocityCount
+		            #end
+	            </div>
+	        #end
+        #end
+        $listFooter
+        <font color="gray">&nbsp;&nbsp;Rendered <span id="rendered"></span></font>
+    </div>
+  </div>
+  <script>
+  document.getElementById("rendered").innerHTML = Date();
+  </script>
+</body>
+</html>
