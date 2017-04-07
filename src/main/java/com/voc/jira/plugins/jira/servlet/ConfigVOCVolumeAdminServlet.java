@@ -83,7 +83,7 @@ public class ConfigVOCVolumeAdminServlet extends HttpServlet implements ActionLi
 		this.optionsManager = checkNotNull(optionsManager, "optionsManager");
 		this.logoPath = webResourceUrlProvider.getStaticPluginResourceUrl(
 				"com.voc.jira.plugins.VOC-Utilities:resources",
-				"ConstantContactLogo_300x50.gif", UrlMode.ABSOLUTE);
+				"voc-volume-logo", UrlMode.ABSOLUTE);
 		this.baseUrl = applicationProperties.getBaseUrl();
 	}
 

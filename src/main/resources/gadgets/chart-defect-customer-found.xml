@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Module>
   <ModulePrefs 
-    title="Defect Counts and Trends" 
-    directory_title="Defect Counts and Trends" 
+    title="VOC Defect Counts and Trends" 
+    directory_title="VOC Defect Counts and Trends" 
     height="250" 
-    author="Constant Contact, Inc." 
-    author_affiliation="CTCT" author_location="Waltham, MA USA" 
+    author="David Jellison" 
+    author_affiliation="EIGI" author_location="Amesbury, MA USA" 
     author_email="david@jellisons.net" 
     thumbnail='#staticResourceUrl("com.voc.jira.plugins.VOC-Utilities:resources",
     	"chart-defects-customer-found-thumbnail.gif")'
     description="Customer facing and customer found defects counts and trends">
-    <icon>http://www.constantcontact.com/favicon.ico</icon>
+    <icon>#staticResourceUrl("com.voc.jira.plugins.VOC-Utilities:resources","voc-16.ico")</icon>
     <Optional feature="atlassian.util" />
     <Optional feature="gadget-directory">
 	  <Param name="categories">
