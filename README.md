@@ -29,5 +29,5 @@ VOC Utilities plugin for Jira 6.x is a collection of features specific to the Vo
 ## Project Setup
 - VOC Volume [Install and Run Book](https://github.com/constantcontact/voc-utilities-for-jira/wiki/Install-and-Run-Book)
 - VOC Volume [Configuration setup](https://github.com/constantcontact/voc-utilities-for-jira/wiki/VOC-Volume-Configuration) (once installed)
-- [Contributor setup](https://github.com/constantcontact/voc-utilities-for-jira/wiki/Contributor-Setup).
+- VOC Volume [Contributor setup](https://github.com/constantcontact/voc-utilities-for-jira/wiki/Contributor-Setup).
 

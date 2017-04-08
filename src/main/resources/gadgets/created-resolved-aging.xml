@@ -235,7 +235,7 @@
 		      AJS.log("CRA Hooray, got ", args);
 		      var gadget = this;
 		      gadgets.window.setTitle(AJS.format("{0}: {1}", 
-		          "Defects Created vs. Resolved Aging", 
+		          "VOC Defects Created vs. Resolved Aging", 
                   //"__MSG_gadget.cra.display.chart.bar.title__", 
                   gadget.getPref("subtitle")
                   ));
