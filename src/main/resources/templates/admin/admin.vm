@@ -1,11 +1,16 @@
 <html>
 <head>
-    <title>Constant Contact Configuration</title>
+    <title>VOC Volume Configuration</title>
     <meta name="decorator" content="atl.admin" />
     <!-- https://docs.atlassian.com/aui/latest/ -->
     <!-- https://developer.atlassian.com/display/JIRADEV/Plugin+Tutorial+-+Writing+integration+tests+using+PageObjects -->
 </head>
 <body>
+#if($logoPath)
+	<a id="websiteurl" href="$i18n.getText('vocvolume.wiki.url')" target="_blank">
+    	<img id="logoImg" src="$logoPath" />
+    </a>
+#end
 
 <form id="config" action="vocvolume" method="post" class="aui">
 

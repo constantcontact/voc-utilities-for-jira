@@ -5,16 +5,18 @@
     <description>${project.description}</description>
     <version>${project.version}</version>
     <vendor name="${project.organization.name}" url="${project.organization.url}"/>
-    <param name="plugin-icon">images/happy_icon_16.gif</param>
-    <param name="plugin-logo">images/happy_icon_72.gif</param>
-    <param name="vendor-icon">images/happy_icon_16.gif</param>
-    <param name="vendor-logo">images/happy_icon_72.gif</param>
+    <param name="plugin-icon">images/voc-16.png</param>
+    <param name="plugin-logo">images/voc-144.png</param>
+    <param name="vendor-icon">images/voc-16.png</param>
+    <param name="vendor-logo">images/voc-72.png</param>
     <param name="configure.url">/plugins/servlet/config/vocvolume</param>
     <resource name="screenshot.png" location="images/screenshot.png"/>
   </plugin-info>
   <resource type="i18n" name="i18n" location="i18n/VOCUtilities"/>
   <web-resource name="Resources" key="resources">
     <dependency>com.atlassian.auiplugin:ajs</dependency>
+    <resource name="voc-volume-ico" type="download" location="images/voc-16.ico"/>
+    <resource name="voc-volume-logo" type="download" location="images/voc-72.png"/>
     <resource name="voc-volume-thumbnail.gif" type="download" location="images/voc-volume-thumbnail.gif"/>
     <resource name="chart-defects-customer-found-thumbnail.gif" type="download" location="images/chart-defects-customer-found-thumbnail.gif"/>
     <resource name="created-resolved-aging-thumbnail.gif" type="download" location="images/created-resolved-aging-thumbnail.gif"/>

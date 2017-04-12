@@ -63,7 +63,7 @@ public class CreatedAndResolved extends HttpServlet implements IErrorKeeper {
 	private static final String JQL_ALL_RESOLVED = "created-resolved-servlet.jql.all.resolved";	
 	private static final String DATA = "data";
 	private static final String PROJECTS = "projectsJqlClause";
-	private static final String BASE_TITLE = "Defects Created vs. Resolved Aging";
+	private static final String BASE_TITLE = "VOC Defects Created vs. Resolved Aging";
 	private static final String BAR = "created-resolved-servlet.vm.bar";
 	// NOTE: instance variables are shared by all threads -- there is only one
 	// instance of Charts in the server as is the case with any such servlet in
