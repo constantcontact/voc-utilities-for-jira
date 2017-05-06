@@ -67,17 +67,16 @@ public class JqlCacheRequest implements ICacheRequest {
 
 	@Override
 	public String host() {
-		return host;
+		return this.host;
 	}
 	
 	@Override
 	public String port() {
-		return memcachedPort;
+		return this.memcachedPort;
 	}
 	
 	@Override
 	public boolean isMemcached() {
-		return (isMemcached == "yes") ? true : false;
+		return this.isMemcached.toLowerCase().contains("yes");
 	}
-
 }
