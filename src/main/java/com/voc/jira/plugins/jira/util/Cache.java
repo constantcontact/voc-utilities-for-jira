@@ -19,7 +19,7 @@ public class Cache {
 	}
 	
 	public static Object get(ICacheRequest r) {
-		MemcachedClient c = CachePool.getInstance(r.host()).getClient();
+		MemcachedClient c = CachePool.getInstance(r.host(), r.port()).getClient();
 		return get(r,c);
 	}
 	

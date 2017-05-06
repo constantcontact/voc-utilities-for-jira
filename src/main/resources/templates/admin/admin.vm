@@ -17,7 +17,12 @@
     <h2>VOC Volume Configuration</h2>
     
     ##<div class="aui-message">
-    <p>Voice Of the Customer (VOC) Volume is the aggregate collection of instances occurring in the field.</p>
+    <p>Voice Of the Customer (VOC) Volume is the aggregate collection of problems occurring in the field that
+    	link back to software or system defects. This page enables configuration for the VOC Volume plugin.
+    	<a href="$i18n.getText('config.vocvolume.help.url')" target="_blank">
+			<img src="$baseUrl/images/icons/ico_help.png" alt="VOC Volume Configuration Instructions" />
+		</a>
+    </p>
     ##</div>
     
     <h3>Scope</h3>
@@ -90,6 +95,16 @@
 		#end
 		</div>
 		<div class="description">Optional - JQL query to limit the scope of linked issues to apply VOC Volume.</div>
+		
+		<div class="aui-message warning">
+    		<p class="title">
+        		<span class="aui-icon icon-warning"></span>
+        		<strong>Configuration Constraint</strong>
+    		</p>
+    		<p>Currently, all projects in scope for VOC Bug(Defect) Chart gadgets require the project in either
+    		    a "Core Applications" or "Internal Applications" Project Category. 
+        		This will be configurable here in the future.</p>
+		</div>
 	</div>
 #end 
 
@@ -175,7 +190,11 @@
   	</fieldset>
 
 	<h3>Banner Labels</h3>
-	<p style="font-style:italic;">Change the text in the VOC Volume banner or clear the field for default test.</p>
+	<p style="font-style:italic;">Change the text in the VOC Volume banner or clear the field for default test.
+		<a href="$i18n.getText('config.vocvolume.voc-volume-guidance.help.url')" target="_blank">
+			<img src="$baseUrl/images/icons/ico_help.png" alt="VOC Volume Guidance Help" />
+		</a>
+	</p>
 
     <div id="BannerLabelDiv" class="field-group">
         <label for="highGuidance">High</label>
@@ -208,7 +227,11 @@
     </div>
     
     <h3>VOC Severity</h3>
-	  <p style="font-style:italic;">The VOC Severity field is the yardstick of impact to the customer.</p>
+	  <p style="font-style:italic;">The VOC Severity field is the yardstick of impact to the customer.
+	    <a href="$i18n.getText('config.vocvolume.severity.help.url')" target="_blank">
+			<img src="$baseUrl/images/icons/ico_help.png" alt="Severity Custom Field Help" />
+		</a>
+	  </p>
   	
   	<fieldset class="group">
 	  <legend><span>VOC Severity Level</span></legend>
@@ -234,6 +257,37 @@
 		</div>
 #end
   	</fieldset>
+
+    <h3>Gadget Caching</h3>
+	  <p style="font-style:italic;">Enable memcached client and configure memcached 
+	  	server for caching chart computed data per month.
+	  	<a href="$i18n.getText('config.vocvolume.memcached.help.url')" target="_blank">
+			<img src="$baseUrl/images/icons/ico_help.png" alt="Memcached Configuration Instructions" />
+		</a>
+	  </p>
+	<fieldset class="group">
+	  <legend><span></span></legend>
+	    <div class="checkbox">
+	      <input class="checkbox" type="checkbox" id="isMemcached" name="isMemcached" value="yes" 
+	      #if ($isMemcached && $isMemcached == "yes")
+		    checked="yes"
+		  #end
+	        />
+	    <label for="isMemcached">Enable memcached client for VOC defect chart gadgets</label>
+	  </div>
+  	</fieldset>
+  	
+    <div id="MemcachedServerHostDiv" class="field-group">
+        <label for="memcachedServerHost">Server Host</label>
+        <input id="memcachedServerHost" type="text" class="text" name="memcachedServerHost" value="$memcachedServerHost" width="42" size="42"/>        
+		<div class="description">Default: $memcachedServerHostDefault</div>
+    </div>
+    
+    <div id="MemcachedServerPortDiv" class="field-group">
+        <label for="memcachedServerPort">Server Port</label>
+        <input id="memcachedServerPort" type="text" class="text" name="memcachedServerPort" value="$memcachedServerPort" width="42" size="42"/>        
+		<div class="description">Default: $memcachedServerPortDefault</div>
+    </div>
 
     <br/>
     <div class="buttons-container">

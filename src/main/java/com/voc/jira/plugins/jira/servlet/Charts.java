@@ -38,6 +38,7 @@ import com.atlassian.sal.api.ApplicationProperties;
 import com.atlassian.sal.api.message.I18nResolver;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
+import com.voc.jira.plugins.jira.components.ConfigurationManager;
 import com.voc.jira.plugins.jira.util.Cache;
 import com.voc.jira.plugins.jira.util.Issues;
 import com.voc.jira.plugins.jira.util.Jql;
@@ -74,6 +75,7 @@ public class Charts extends HttpServlet implements IErrorKeeper {
     private final I18nResolver i18n;
     private final JiraWebResourceManager webResourceManager;
     private final SearchService searchService;
+    private final ConfigurationManager configMgr;
 	private final String colorCFEscaping = "#4C6C9C";
 	private final String colorCFCustFound = "#9DB1CF";
 	private final String colorCFCustFacing = "#DFE5EF";
@@ -83,7 +85,7 @@ public class Charts extends HttpServlet implements IErrorKeeper {
 	private final String baseUrl;
 
     private HashSet<Long> getIssues(String keyBase, String key, Map<String, Object> context) {
-		Issues request = new Issues(getJqlQuery(key),context, searchService, user, this, this.baseUrl,keyBase);
+		Issues request = new Issues(getJqlQuery(key),context, searchService, user, this, this.baseUrl,keyBase, this.configMgr);
     	return getIssuesHelper(request);
 	}
     
@@ -107,7 +109,8 @@ public class Charts extends HttpServlet implements IErrorKeeper {
             I18nResolver i18n,
             JiraWebResourceManager webResourceManager,
             WebResourceUrlProvider webResourceUrlProvider,
-    		SearchService searchService) {
+    		SearchService searchService,
+    		ConfigurationManager configMgr) {
         this.renderer = templateRenderer;
         this.jiraUserManager = jiraUserManager;
         this.i18n = i18n;
@@ -118,6 +121,7 @@ public class Charts extends HttpServlet implements IErrorKeeper {
         this.searchService = searchService;
 	    this.baseUrl = applicationProperties.getBaseUrl();
 	    this.userManager = userManager;
+	    this.configMgr = configMgr;
     }
 
     private List<Map<String, Object>> getDataSetWithSeparateQueries(boolean businessCritical,StringBuilder timings,String projects,Date begin,Date end,boolean useHardCodedData, final String customClause, Map<String, Object> context,boolean includeChart) {
