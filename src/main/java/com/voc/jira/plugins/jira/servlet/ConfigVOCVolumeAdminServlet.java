@@ -52,6 +52,8 @@ public class ConfigVOCVolumeAdminServlet extends HttpServlet implements ActionLi
 	private static final String HIGH_GUIDANCE_DEFAULT = "Many customers have reported.";
 	private static final String MED_GUIDANCE_DEFAULT = "Several customers have reported.";
 	private static final String LOW_GUIDANCE_DEFAULT = "A few customers have reported.";
+	private static final String MEMCACHED_SERVER_HOST_DEFAULT = "localhost";
+	private static final String MEMCACHED_SERVER_PORT_DEFAULT = "11211";
 	private static final long serialVersionUID = 42L;
 	private final UserManager userManager;
 	private final TemplateRenderer templateRenderer;
@@ -103,10 +105,18 @@ public class ConfigVOCVolumeAdminServlet extends HttpServlet implements ActionLi
 		context.put("highGuidanceDefault", HIGH_GUIDANCE_DEFAULT);
 		context.put("medGuidanceDefault", MED_GUIDANCE_DEFAULT);
 		context.put("lowGuidanceDefault", LOW_GUIDANCE_DEFAULT);
+		context.put("memcachedServerHostDefault", MEMCACHED_SERVER_HOST_DEFAULT);
+		context.put("memcachedServerPortDefault", MEMCACHED_SERVER_PORT_DEFAULT);
 		if (configurationManager.getIsVisible().contains("yes")) {
 			context.put("isVisible", "yes");
 		} else {
 			context.put("isVisible", "no");
+		}
+		if (configurationManager.getIsMemcached().contains("yes")) {
+			System.out.println("getIsMemcached() == yes");
+			context.put("isMemcached", "yes");
+		} else {
+			context.put("isMemcached", "no");
 		}
 		if (isCustomFieldPresent("Uservoice")) {
 			context.put("cfUservoice", "success");
@@ -136,7 +146,6 @@ public class ConfigVOCVolumeAdminServlet extends HttpServlet implements ActionLi
 		if (isCustomFieldPresent("VOC Volume")) {
 			context.put("cfVOCVolume", getCustomFieldOptions("VOC Volume"));
 		}
-		System.out.println("just before if (isCustomFieldPresent(selectSeverityField.getSeverityFieldName()))");
 		if (isCustomFieldPresent(SelectSeverityField.getSeverityFieldName())) {
 			context.put("cfSeverity", getCustomFieldOptions(SelectSeverityField.getSeverityFieldName()));
 			context.put("cfSeverityName", SelectSeverityField.getSeverityFieldName());
@@ -156,6 +165,16 @@ public class ConfigVOCVolumeAdminServlet extends HttpServlet implements ActionLi
 			context.put("lowGuidance", configurationManager.getLowGuidance());
 		} else {
 			context.put("lowGuidance", LOW_GUIDANCE_DEFAULT);
+		}
+		if (configurationManager.getMemcachedServerHost().length() > 0) {
+			context.put("memcachedServerHost", configurationManager.getMemcachedServerHost());
+		} else {
+			context.put("memcachedServerHost", MEMCACHED_SERVER_HOST_DEFAULT);
+		}
+		if (configurationManager.getMemcachedServerPort().length() > 0) {
+			context.put("memcachedServerPort", configurationManager.getMemcachedServerPort());
+		} else {
+			context.put("memcachedServerPort", MEMCACHED_SERVER_PORT_DEFAULT);
 		}
 		context.put("logoPath", logoPath);
 		context.put("baseUrl", baseUrl);
@@ -184,6 +203,8 @@ public class ConfigVOCVolumeAdminServlet extends HttpServlet implements ActionLi
 			redirectToLogin(req, resp);
 			return;
 		}
+		
+		//System.out.println("doPost req isMemcached == " + req.getParameter("isMemcached"));
 
 		User user = UserUtils.getUser(username);
 
@@ -192,6 +213,8 @@ public class ConfigVOCVolumeAdminServlet extends HttpServlet implements ActionLi
 		context.put("highGuidanceDefault", HIGH_GUIDANCE_DEFAULT);
 		context.put("medGuidanceDefault", MED_GUIDANCE_DEFAULT);
 		context.put("lowGuidanceDefault", LOW_GUIDANCE_DEFAULT);
+		context.put("memcachedServerHostDefault", MEMCACHED_SERVER_HOST_DEFAULT);
+		context.put("memcachedServerPortDefault", MEMCACHED_SERVER_PORT_DEFAULT);
 		context.put("logoPath", logoPath);
 		context.put("baseUrl", baseUrl);
 		configurationManager.updateConfiguration(
@@ -201,7 +224,10 @@ public class ConfigVOCVolumeAdminServlet extends HttpServlet implements ActionLi
 				req.getParameter("createSeverity"),
 				req.getParameter("highGuidance"),
 				req.getParameter("medGuidance"),
-				req.getParameter("lowGuidance"));
+				req.getParameter("lowGuidance"),
+				req.getParameter("isMemcached"),
+				req.getParameter("memcachedServerHost"),
+				req.getParameter("memcachedServerPort"));
 		context.put("SMTPServer", configurationManager.getSMTPServer());
 		if (configurationManager.getIssuetypesJQL().length() > 0) {
 			context.put("issuetypesJQL",
@@ -218,12 +244,15 @@ public class ConfigVOCVolumeAdminServlet extends HttpServlet implements ActionLi
 		} else {
 			context.put("jql", "");
 		}
-		// System.out.println("doPost:CM:getIsVisible = " +
-		// configurationManager.getIsVisible());
 		if (configurationManager.getIsVisible().contains("yes")) {
 			context.put("isVisible", "yes");
 		} else {
 			context.put("isVisible", "no");
+		}
+		if (configurationManager.getIsMemcached().contains("yes")) {
+			context.put("isMemcached", "yes");
+		} else {
+			context.put("isMemcached", "no");
 		}
 		if (isCustomFieldPresent("Uservoice")) {
 			context.put("cfUservoice", "success");
@@ -281,6 +310,16 @@ public class ConfigVOCVolumeAdminServlet extends HttpServlet implements ActionLi
 			context.put("lowGuidance", configurationManager.getLowGuidance());
 		} else {
 			context.put("lowGuidance", LOW_GUIDANCE_DEFAULT);
+		}
+		if (configurationManager.getMemcachedServerHost().length() > 0) {
+			context.put("memcachedServerHost", configurationManager.getMemcachedServerHost());
+		} else {
+			context.put("memcachedServerHost", MEMCACHED_SERVER_HOST_DEFAULT);
+		}
+		if (configurationManager.getMemcachedServerPort().length() > 0) {
+			context.put("memcachedServerPort", configurationManager.getMemcachedServerPort());
+		} else {
+			context.put("memcachedServerPort", MEMCACHED_SERVER_PORT_DEFAULT);
 		}
 		templateRenderer.render(ADMIN_TEMPLATE, context, resp.getWriter());
 	}

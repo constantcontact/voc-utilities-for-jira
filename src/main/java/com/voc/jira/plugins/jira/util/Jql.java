@@ -10,6 +10,7 @@ import com.atlassian.jira.issue.search.SearchResults;
 import com.atlassian.jira.jql.builder.JqlQueryBuilder;
 import com.atlassian.jira.web.bean.PagerFilter;
 import com.atlassian.query.Query;
+import com.voc.jira.plugins.jira.components.ConfigurationManager;
 import com.voc.jira.plugins.jira.servlet.IErrorKeeper;
 
 public class Jql {
@@ -32,8 +33,8 @@ public class Jql {
 
 	public static int getSearchCount(String query,
 			Map<String, Object> context, final SearchService searchService,
-			final User user, IErrorKeeper err, String baseUrl, String keyBase) {
-		IssueCount c = new IssueCount(query, context, searchService, user, err, baseUrl, keyBase);
+			final User user, IErrorKeeper err, String baseUrl, String keyBase, ConfigurationManager configMgr) {
+		IssueCount c = new IssueCount(query, context, searchService, user, err, baseUrl, keyBase, configMgr);
 		return (Integer)Cache.get(c);
 	}
 

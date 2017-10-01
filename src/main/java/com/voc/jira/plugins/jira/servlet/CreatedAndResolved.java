@@ -36,6 +36,7 @@ import com.atlassian.sal.api.ApplicationProperties;
 import com.atlassian.sal.api.message.I18nResolver;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
+import com.voc.jira.plugins.jira.components.ConfigurationManager;
 import com.voc.jira.plugins.jira.util.AvgDays;
 import com.voc.jira.plugins.jira.util.AvgDaysData;
 import com.voc.jira.plugins.jira.util.Cache;
@@ -77,6 +78,7 @@ public class CreatedAndResolved extends HttpServlet implements IErrorKeeper {
 	private final JiraWebResourceManager webResourceManager;
 	private final SearchService searchService;
 	private final String baseUrl;
+	private final ConfigurationManager configMgr;
 	private static final String TITLE = "title";
 	public CreatedAndResolved(JiraAuthenticationContext jiraAuthenticationContext,
 			com.atlassian.jira.user.util.UserManager jiraUserManager,
@@ -84,7 +86,8 @@ public class CreatedAndResolved extends HttpServlet implements IErrorKeeper {
 			ApplicationProperties applicationProperties, I18nResolver i18n,
 			JiraWebResourceManager webResourceManager,
 			WebResourceUrlProvider webResourceUrlProvider,
-			SearchService searchService) {
+			SearchService searchService,
+			ConfigurationManager configMgr) {
 		this.renderer = templateRenderer;
 		this.i18n = i18n;
 		this.webResourceManager = webResourceManager;
@@ -93,6 +96,7 @@ public class CreatedAndResolved extends HttpServlet implements IErrorKeeper {
 		this.user = applicationUser.getDirectoryUser();
 		this.searchService = searchService;
 		this.baseUrl = applicationProperties.getBaseUrl();
+		this.configMgr = configMgr;
 	}
 
 	/**
@@ -162,7 +166,7 @@ public class CreatedAndResolved extends HttpServlet implements IErrorKeeper {
             	// current created
         		final String qcc = String.format(i18n.getText(JQL_CURRENT),projectsClause,customClause,monthStart,nextMonthStart);
            		String keyBase = String.format("cra:CURRENT:%s:%s:%s:%s",projectsClause,customClause,monthStart,nextMonthStart);
-            	int ncc = Jql.getSearchCount(qcc,context,searchService,user,this,this.baseUrl,keyBase);
+            	int ncc = Jql.getSearchCount(qcc,context,searchService,user,this,this.baseUrl,keyBase,configMgr);
             	if (RequestError.happened(context)) {
             		break;
             	}
@@ -170,7 +174,7 @@ public class CreatedAndResolved extends HttpServlet implements IErrorKeeper {
             	// current unresolved
             	final String qcu = String.format(i18n.getText(JQL_CURRENT_UNRESOLVED),projectsClause,customClause,monthStart,nextMonthStart,nextMonthStart); 
            		keyBase = String.format("cra:CURRENT_UNRESOLVED:%s:%s:%s:%s",projectsClause,customClause,monthStart,nextMonthStart);
-            	int ncu = Jql.getSearchCount(qcu,context,searchService,user,this,this.baseUrl,keyBase);
+            	int ncu = Jql.getSearchCount(qcu,context,searchService,user,this,this.baseUrl,keyBase,configMgr);
             	if (RequestError.happened(context)) {
             		break;
             	}
@@ -178,7 +182,7 @@ public class CreatedAndResolved extends HttpServlet implements IErrorKeeper {
             	// recent unresolved
             	final String qru = String.format(i18n.getText(JQL_RECENT_UNRESOVLED),projectsClause,customClause,recentStart,monthStart,nextMonthStart);
            		keyBase = String.format("cra:RECENT_UNRESOVLED:%s:%s:%s:%s",projectsClause,customClause,monthStart,nextMonthStart);
-            	int nru = Jql.getSearchCount(qru,context,searchService,user,this,this.baseUrl,keyBase);
+            	int nru = Jql.getSearchCount(qru,context,searchService,user,this,this.baseUrl,keyBase,configMgr);
             	if (RequestError.happened(context)) {
             		break;
             	}
@@ -186,7 +190,7 @@ public class CreatedAndResolved extends HttpServlet implements IErrorKeeper {
             	// recent
             	final String qr = String.format(i18n.getText(JQL_RECENT),projectsClause,customClause,recentStart,monthStart,monthStart);
            		keyBase = String.format("cra:RECENT:%s:%s:%s:%s",projectsClause,customClause,monthStart,nextMonthStart);
-            	int nr = Jql.getSearchCount(qr,context,searchService,user,this,this.baseUrl,keyBase);
+            	int nr = Jql.getSearchCount(qr,context,searchService,user,this,this.baseUrl,keyBase,configMgr);
             	if (RequestError.happened(context)) {
             		break;
             	}
@@ -194,7 +198,7 @@ public class CreatedAndResolved extends HttpServlet implements IErrorKeeper {
             	// old unresolved
             	final String qou = String.format(i18n.getText(JQL_OLD_UNRESOLVED),projectsClause,customClause,recentStart,nextMonthStart);
            		keyBase = String.format("cra:OLD_UNRESOLVED:%s:%s:%s:%s",projectsClause,customClause,monthStart,nextMonthStart);
-            	int nou = Jql.getSearchCount(qou,context,searchService,user,this,this.baseUrl,keyBase);
+            	int nou = Jql.getSearchCount(qou,context,searchService,user,this,this.baseUrl,keyBase,configMgr);
             	if (RequestError.happened(context)) {
             		break;
             	}
@@ -202,7 +206,7 @@ public class CreatedAndResolved extends HttpServlet implements IErrorKeeper {
             	// old resolved
             	final String qor = String.format(i18n.getText(JQL_OLD_RESOLVED),projectsClause,customClause,recentStart,monthStart,nextMonthStart);
            		keyBase = String.format("cra:OLD_RESOLVED:%s:%s:%s:%s",projectsClause,customClause,monthStart,nextMonthStart);
-            	int nor = Jql.getSearchCount(qor,context,searchService,user,this,this.baseUrl,keyBase);
+            	int nor = Jql.getSearchCount(qor,context,searchService,user,this,this.baseUrl,keyBase,configMgr);
             	if (RequestError.happened(context)) {
             		break;
             	}
@@ -210,7 +214,7 @@ public class CreatedAndResolved extends HttpServlet implements IErrorKeeper {
             	final String qar = String.format(i18n.getText(JQL_ALL_RESOLVED),projectsClause,customClause,monthStart,nextMonthStart);
             	final String arUrl = Jql.getQueryUrl(qar, baseUrl);
            		keyBase = String.format("cra:ALL_RESOLVED:%s:%s:%s:%s",projectsClause,customClause,monthStart,nextMonthStart);
-            	AvgDays avgDaysRequest = new AvgDays(qar, context, searchService, user, this,this.baseUrl,keyBase);
+            	AvgDays avgDaysRequest = new AvgDays(qar, context, searchService, user, this,this.baseUrl,keyBase,configMgr);
             	AvgDaysData avgDaysData = (AvgDaysData)Cache.get(avgDaysRequest);
             	if (RequestError.happened(context)) {
             		break;

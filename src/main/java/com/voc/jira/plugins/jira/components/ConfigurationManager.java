@@ -9,7 +9,7 @@ import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.voc.jira.plugins.jira.customfield.SelectSeverityField;
 
 public class ConfigurationManager {
-	private static final String PLUGIN_STORAGE_KEY = "com.voc.jira.plugins.jira";
+	public static final String PLUGIN_STORAGE_KEY = "com.voc.jira.plugins.jira";
     private static final String SMTP_SERVER = "smtp.roving.com";
     private static final String JQL = "jql";
     private static final String ISSUETYPES_JQL = "issuetypesJQL";
@@ -17,6 +17,8 @@ public class ConfigurationManager {
     private static final String HIGH_GUIDANCE = "highGuidance";
     private static final String MED_GUIDANCE = "medGuidance";
     private static final String LOW_GUIDANCE = "lowGuidance";
+    private static final String MEMCACHED_SERVER_HOST = "memcachedServerHost";
+    private static final String MEMCACHED_SERVER_PORT = "memcachedServerPort";
     private static final String VOC_REQUEST = "VOC Request";
     private static final String SUPPORT_REQUEST = "Support Request";
     private static final String CREATE_SEVERITY = "createSeverity";
@@ -29,10 +31,14 @@ public class ConfigurationManager {
     private static final String FEEDBACKFORUMS = "Feedback Forums";
     private static final String SALESFORCE = "Salesforce";
     public final String VOC_VOLUME_OTHER_VALUE = "VOC Volume Other Value";
+    
+    // Memcached Server (host:port) and Client enabled
+    private static final String IS_MEMCACHED = "isMemcached";
 
-    private final PluginSettingsFactory pluginSettingsFactory;
-    public ConfigurationManager(PluginSettingsFactory pluginSettingsFactory) {
-        this.pluginSettingsFactory = pluginSettingsFactory;
+    private static PluginSettingsFactory pluginSettingsFactory;
+    
+	public ConfigurationManager(PluginSettingsFactory pluginSettingsFactory) {
+        ConfigurationManager.pluginSettingsFactory = pluginSettingsFactory;
     }
 
     public String getSMTPServer() {
@@ -63,6 +69,14 @@ public class ConfigurationManager {
     	return getValue(LOW_GUIDANCE);
     }
     
+    public String getMemcachedServerHost() {
+    	return getValue(MEMCACHED_SERVER_HOST);
+    }
+    
+    public String getMemcachedServerPort() {
+    	return getValue(MEMCACHED_SERVER_PORT);
+    }
+    
     public String getVOCRequest() {
     	return getValue(VOC_REQUEST);
     }
@@ -73,6 +87,10 @@ public class ConfigurationManager {
     
     public String getCreateSeverity() {
     	return getValue(CREATE_SEVERITY);
+    }
+    
+    public String getIsMemcached(){
+    	return getValue(IS_MEMCACHED);
     }
     
     public Map<String, Integer> getVOCCustomFields() {
@@ -145,7 +163,8 @@ public class ConfigurationManager {
     }
 
     public void updateConfiguration(String smtpServer, String issuetypesJQL, String jql, String isVisible, 
-    		String createSeverity, String highGuidance, String medGuidance, String lowGuidance) {
+    		String createSeverity, String highGuidance, String medGuidance, String lowGuidance, 
+    		String isMemcached, String memcachedServerHost, String memcachedServerPort) {
         PluginSettings settings = pluginSettingsFactory.createSettingsForKey(PLUGIN_STORAGE_KEY);
         settings.put(SMTP_SERVER, smtpServer);
         settings.put(ISSUETYPES_JQL, issuetypesJQL);
@@ -161,10 +180,30 @@ public class ConfigurationManager {
         	settings.put(IS_VISIBLE, "no");
         }
         
+        try {
+	        if(isMemcached.contains("yes")) {
+	        	settings.put(IS_MEMCACHED, isMemcached);
+	        } else {
+	        	settings.put(IS_MEMCACHED, "no");
+	        }
+        } catch(NullPointerException e) {
+        	settings.put(IS_MEMCACHED, "no");
+        }
+        
         /*
-        if(!GenericTextField.isTextField(USERVOICE)) {
+        if(!GenericNumberField.isTextField(USERVOICE)) {
         	try {
-				GenericTextField.createTextField(USERVOICE,"");
+				GenericNumberField.createTextField(USERVOICE,"");
+			} catch (GenericEntityException e) {
+				e.printStackTrace();
+			}
+        }
+        */
+        
+        /*
+        if(!GenericTextField.isTextField(USERVOICE_LABEL)) {
+        	try {
+				GenericTextField.createTextField(USERVOICE_LABEL,"");
 			} catch (GenericEntityException e) {
 				e.printStackTrace();
 			}
@@ -193,6 +232,8 @@ public class ConfigurationManager {
         settings.put(HIGH_GUIDANCE, highGuidance);
         settings.put(MED_GUIDANCE, medGuidance);
         settings.put(LOW_GUIDANCE, lowGuidance);
+        settings.put(MEMCACHED_SERVER_HOST, memcachedServerHost);
+        settings.put(MEMCACHED_SERVER_PORT, memcachedServerPort);
     }
     
 }

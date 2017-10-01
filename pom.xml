@@ -4,10 +4,10 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.voc.jira.plugins</groupId>
     <artifactId>VOC-Utilities</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <organization>
-        <name>Endurance</name>
-        <url>http://endurance.com</url>
+        <name>David Jellison</name>
+        <url>https://github.com/constantcontact/voc-utilities-for-jira/wiki</url>
     </organization>
     <name>VOC Utilities</name>
     <description>Collection of workflow validator and gadget modules.</description>
@@ -99,7 +99,9 @@
         <dependency>
             <groupId>net.spy</groupId>
             <artifactId>spymemcached</artifactId>
-            <version>2.11.4</version>
+            <!-- <version>2.11.4</version> -->
+            <!-- <version>2.12.2</version> -->
+            <version>2.12.3</version>
         </dependency>
     </dependencies>
     <build>

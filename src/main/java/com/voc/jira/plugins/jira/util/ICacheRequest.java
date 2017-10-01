@@ -18,6 +18,11 @@ public interface ICacheRequest {
 	 */
 	String host();
 	
+	/** Client port (e.g. 11211 by default or as specified in the VOC Volume administration console)
+	 * @return
+	 */
+	String port();
+	
 	/** Key used by memcached. Probably should include host:some-value:some-type
 	 * @return
 	 */
@@ -32,4 +37,9 @@ public interface ICacheRequest {
 	 * @return
 	 */
 	boolean getLatest();
+
+	/** True if user is requesting the latest. False if we should try to find the value in the cache.
+	 * @return
+	 */
+	boolean isMemcached();
 }

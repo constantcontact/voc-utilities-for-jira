@@ -18,8 +18,18 @@ public class Cache {
 		log.error(msg);
 	}
 	
+	/**
+	 * Create MemcachedClient with a pool of cache threads if "Enable memcached client for VOC defect chart gadgets" 
+	 * is set in the VOC Volume administration console.
+	 * @param r
+	 * @return
+	 */
 	public static Object get(ICacheRequest r) {
-		MemcachedClient c = CachePool.getInstance(r.host()).getClient();
+		//System.out.println("--In Cache.get(ICacheRequest r), r.isMemcached() == " + r.isMemcached());
+		MemcachedClient c = null;
+		if(r.isMemcached()) {
+			c = CachePool.getInstance(r.host(), r.port()).getClient();
+		}
 		return get(r,c);
 	}
 	

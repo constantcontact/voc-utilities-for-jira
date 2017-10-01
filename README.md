@@ -21,6 +21,12 @@ VOC Utilities plugin for Jira 6.x is a collection of features specific to the Vo
 - "VOC Created and Resolved" adds a Dashboard Gadget that illustrates found vs. resolved and aging over time horizons
 
 ## Build History
+
+### version 3.0.1
+<ol>
+  <li>Add memcached configuration for server and port, and toggle its use</li>
+</ol>
+
 ### version 3.0.0
 <ol>
   <li>Initial Open Source Release</li>
@@ -29,5 +35,5 @@ VOC Utilities plugin for Jira 6.x is a collection of features specific to the Vo
 ## Project Setup
 - VOC Volume [Install and Run Book](https://github.com/constantcontact/voc-utilities-for-jira/wiki/Install-and-Run-Book)
 - VOC Volume [Configuration setup](https://github.com/constantcontact/voc-utilities-for-jira/wiki/VOC-Volume-Configuration) (once installed)
-- VOC Volume [Contributor setup](https://github.com/constantcontact/voc-utilities-for-jira/wiki/Contributor-Setup).
+- VOC Volume [Contributor setup](https://github.com/constantcontact/voc-utilities-for-jira/wiki/Contributor-Setup) (if contributing back changes to code base).
 

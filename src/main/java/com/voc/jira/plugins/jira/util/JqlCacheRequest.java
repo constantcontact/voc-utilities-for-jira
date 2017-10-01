@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.search.SearchService;
+import com.voc.jira.plugins.jira.components.ConfigurationManager;
 import com.voc.jira.plugins.jira.servlet.IErrorKeeper;
 
 public class JqlCacheRequest implements ICacheRequest {
@@ -18,17 +19,24 @@ public class JqlCacheRequest implements ICacheRequest {
 	final User user;
 	final IErrorKeeper err;
 	final String host;
+	final String memcachedPort;
+	final String isMemcached;
+	final ConfigurationManager configMgr;
 	private static final Logger log = LoggerFactory.getLogger(JqlCacheRequest.class);
     
 	public JqlCacheRequest(String jql, Map<String, Object> context,
-			final SearchService searchService, final User user, IErrorKeeper err,final String baseUrl,final String keyBase) {
+			final SearchService searchService, final User user, IErrorKeeper err,
+			final String baseUrl,final String keyBase, ConfigurationManager configMgr) {
 		this.jql = jql;
 		this.keyBase = keyBase;
 		this.context = context;
 		this.searchService = searchService;
 		this.user = user;
 		this.err = err;
-		this.host = Url.getHost(baseUrl);
+		this.configMgr = configMgr;
+		this.host = configMgr.getMemcachedServerHost();   // this.host = Url.getHost(baseUrl);
+		this.memcachedPort = configMgr.getMemcachedServerPort();
+		this.isMemcached = configMgr.getIsMemcached();
 	}
 
 	@Override
@@ -59,7 +67,16 @@ public class JqlCacheRequest implements ICacheRequest {
 
 	@Override
 	public String host() {
-		return host;
+		return this.host;
 	}
-
+	
+	@Override
+	public String port() {
+		return this.memcachedPort;
+	}
+	
+	@Override
+	public boolean isMemcached() {
+		return this.isMemcached.toLowerCase().contains("yes");
+	}
 }

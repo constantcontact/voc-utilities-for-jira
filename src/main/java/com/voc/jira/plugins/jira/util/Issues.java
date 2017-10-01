@@ -9,13 +9,14 @@ import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.search.SearchResults;
+import com.voc.jira.plugins.jira.components.ConfigurationManager;
 import com.voc.jira.plugins.jira.servlet.IErrorKeeper;
 
 public class Issues extends JqlCacheRequest implements ICacheRequest {
 	
 	public Issues(String jql, Map<String, Object> context, final SearchService searchService,
-			final User user, IErrorKeeper err, final String baseUrl, String keyBase) {
-		super(jql,context,searchService,user,err,baseUrl,keyBase);
+			final User user, IErrorKeeper err, final String baseUrl, String keyBase, ConfigurationManager configMgr) {
+		super(jql,context,searchService,user,err,baseUrl,keyBase, configMgr);
 	}
 
 	@Override
