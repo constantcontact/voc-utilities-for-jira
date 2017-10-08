@@ -4,10 +4,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.customfields.manager.OptionsManager;
+import com.atlassian.jira.user.ApplicationUser;
 import com.voc.jira.plugins.jira.servlet.IErrorKeeper;
 import com.voc.jira.plugins.jira.servlet.IValidator;
 import com.voc.jira.plugins.jira.servlet.NoValidation;
@@ -59,7 +59,8 @@ public class Param {
 		return url;
 	}
 
-	public static String getCustomJql(HttpServletRequest req,Map<String, Object> context, IErrorKeeper keeper, SearchService searchService, User user) {
+	public static String getCustomJql(HttpServletRequest req,Map<String, Object> context, 
+			IErrorKeeper keeper, SearchService searchService, ApplicationUser user) {
 		String param = req.getParameter(CUSTOM_JQL);
 		if (param == null) {
 			context.put(CUSTOM_JQL, "");

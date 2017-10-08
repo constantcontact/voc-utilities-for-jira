@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.plugin.webresource.JiraWebResourceManager;
@@ -72,7 +71,7 @@ public class CreatedAndResolved extends HttpServlet implements IErrorKeeper {
 	private static final long serialVersionUID = -101869979013349976L;
 	private static final Logger log = LoggerFactory.getLogger(CreatedAndResolved.class);
 	private final TemplateRenderer renderer;
-	private final User user;
+	private final ApplicationUser user;
 	private final ProjectManager projectManager;
 	private final I18nResolver i18n;
 	private final JiraWebResourceManager webResourceManager;
@@ -91,9 +90,9 @@ public class CreatedAndResolved extends HttpServlet implements IErrorKeeper {
 		this.renderer = templateRenderer;
 		this.i18n = i18n;
 		this.webResourceManager = webResourceManager;
-		ApplicationUser applicationUser = jiraAuthenticationContext.getUser();
+		ApplicationUser applicationUser = jiraAuthenticationContext.getLoggedInUser();
 		this.projectManager = ComponentAccessor.getProjectManager();
-		this.user = applicationUser.getDirectoryUser();
+		this.user = applicationUser;
 		this.searchService = searchService;
 		this.baseUrl = applicationProperties.getBaseUrl();
 		this.configMgr = configMgr;

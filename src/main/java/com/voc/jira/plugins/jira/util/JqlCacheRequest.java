@@ -1,12 +1,10 @@
 package com.voc.jira.plugins.jira.util;
 
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.search.SearchService;
+import com.atlassian.jira.user.ApplicationUser;
 import com.voc.jira.plugins.jira.components.ConfigurationManager;
 import com.voc.jira.plugins.jira.servlet.IErrorKeeper;
 
@@ -16,16 +14,16 @@ public class JqlCacheRequest implements ICacheRequest {
 	final String keyBase;
 	final Map<String, Object> context;
 	final SearchService searchService;
-	final User user;
+	final ApplicationUser user;
 	final IErrorKeeper err;
 	final String host;
 	final String memcachedPort;
-	final String isMemcached;
+	final boolean isMemcached;
 	final ConfigurationManager configMgr;
 	private static final Logger log = LoggerFactory.getLogger(JqlCacheRequest.class);
     
 	public JqlCacheRequest(String jql, Map<String, Object> context,
-			final SearchService searchService, final User user, IErrorKeeper err,
+			final SearchService searchService, final ApplicationUser user, IErrorKeeper err,
 			final String baseUrl,final String keyBase, ConfigurationManager configMgr) {
 		this.jql = jql;
 		this.keyBase = keyBase;
@@ -36,7 +34,7 @@ public class JqlCacheRequest implements ICacheRequest {
 		this.configMgr = configMgr;
 		this.host = configMgr.getMemcachedServerHost();   // this.host = Url.getHost(baseUrl);
 		this.memcachedPort = configMgr.getMemcachedServerPort();
-		this.isMemcached = configMgr.getIsMemcached();
+		this.isMemcached = configMgr.getIsMemcached().toLowerCase().contains("yes");
 	}
 
 	@Override
@@ -77,6 +75,6 @@ public class JqlCacheRequest implements ICacheRequest {
 	
 	@Override
 	public boolean isMemcached() {
-		return this.isMemcached.toLowerCase().contains("yes");
+		return this.isMemcached;
 	}
 }

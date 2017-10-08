@@ -37,8 +37,8 @@ public class SeverityNotNoneValidator implements Validator
       CustomField customField = customFieldManager.getCustomFieldObjectByName(SEVERITY);
       String errorMsg = SEVERITY + " must be changed from the default value '"
           + SEVERITY_DEFAULT + "' for all 'Defect' issues.";
-      if(defectTypes.contains(issue.getIssueTypeObject().getName())){
-	    log.info(issue.getIssueTypeObject().getName()
+      if(defectTypes.contains(issue.getIssueType().getName())){
+	    log.info(issue.getIssueType().getName()
 	        + " IssueType is one of the known defect issue types collection.");
 	    if (customField == null) {  
 	        throw new IllegalArgumentException("customField \"" + SEVERITY + "\" (case sensitive) not found");

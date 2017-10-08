@@ -6,13 +6,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
 import javax.annotation.Nonnull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.JiraDataType;
 import com.atlassian.jira.JiraDataTypes;
 import com.atlassian.jira.bc.filter.SearchRequestService;
@@ -24,19 +20,16 @@ import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.issue.link.IssueLinkManager;
 import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.LinkCollection;
-import com.atlassian.jira.issue.search.SearchException;
-import com.atlassian.jira.issue.search.SearchProvider;
+import com.atlassian.sal.api.search.SearchProvider;
 import com.atlassian.jira.jql.builder.JqlQueryBuilder;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
 import com.atlassian.jira.plugin.jql.function.AbstractJqlFunction;
 import com.atlassian.jira.plugin.jql.function.JqlFunctionModuleDescriptor;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.user.ApplicationUsers;
 import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.jira.util.MessageSetImpl;
-import com.atlassian.jira.web.bean.PagerFilter;
 import com.atlassian.query.Query;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
@@ -132,7 +125,7 @@ public class LinkedIssueTypeCreatedBeforeQuery extends AbstractJqlFunction {
 		return literals;
 	}
 	
-	private List<Long> getIssueIDs(ApplicationUser applicationUser, QueryCreationContext queryCreationContext, 
+	private List<Long> getIssueIDs(ApplicationUser user, QueryCreationContext queryCreationContext, 
 			List<String> arguments) {
 		/* Given a filter and an issueType,
 		 * When applying the filter to get a list of issues
@@ -140,31 +133,36 @@ public class LinkedIssueTypeCreatedBeforeQuery extends AbstractJqlFunction {
 		 * testing links for linked issue Created before issue Created,
 		 * And then add the issues found to a Collection of issues and return.
 		 */
-		User user = applicationUser.getDirectoryUser();
 		final String queryStr = arguments.get(0);
 		final String issueType = arguments.get(1);
 		List<Long> linkedIssueIDs = new ArrayList<Long>();
 		//Search on filter and iterate through issues
 		//Collection<Issue> filteredIssues = Collections.emptyList();
 		final Query query = getQuery(user, queryStr);
-		//System.out.println("SearchRequest query: " + ofilter.getQuery().getQueryString()); //.getName());
-		try {
-			SearchProvider searchProvider = ComponentAccessor.getComponent(SearchProvider.class);
-			ArrayList<Issue> issuesList = new ArrayList<Issue>();
-			issuesList = (ArrayList<Issue>) searchProvider.search(query, user, 
-					PagerFilter.getUnlimitedFilter()).getIssues();
-			//System.out.println("issue list size: " + issuesList.size());
-			for (final Issue issue : issuesList) {
-				// System.out.println("In parsing search list: issue ID = " + issue.getId());
-				linkedIssueIDs.addAll(getLinkedIssueIDs(user, issue, issueType));
-			}
-		} catch(SearchException e) {
-			log.error("SearchException: ", e);
+		SearchProvider searchProvider = (SearchProvider) ComponentAccessor.getComponent(SearchProvider.class);
+		@SuppressWarnings("unchecked")
+		final Iterable<Issue> filteredIssues = (Iterable<Issue>) 
+				searchProvider.search(user.getDisplayName(), query.toString()); 
+						//PagerFilter.getUnlimitedFilter()).getIssues();
+		if (filteredIssues.iterator().hasNext()) {
+			final Issue issue = filteredIssues.iterator().next();
+			// System.out.println("In parsing search list: issue ID = " + issue.getId());
+			linkedIssueIDs.addAll(getLinkedIssueIDs(user, issue, issueType));
 		}
+		/*
+		ArrayList<Issue> issuesList = new ArrayList<Issue>();
+		issuesList = (ArrayList<Issue>) searchProvider.search(query, applicationUser, 
+				PagerFilter.getUnlimitedFilter()).getIssues();
+		//System.out.println("issue list size: " + issuesList.size());
+		for (final Issue issue : issuesList) {
+			// System.out.println("In parsing search list: issue ID = " + issue.getId());
+			linkedIssueIDs.addAll(getLinkedIssueIDs(user, issue, issueType));
+		}
+		*/
 		return linkedIssueIDs;
 	}
 	
-	private Query getQuery(User user, String queryStr) {
+	private Query getQuery(ApplicationUser user, String queryStr) {
 		if (queryStr == null) {
 			log.warn(i18n.getText("linkedIssuetypeCreatedBeforeQuery.query.null", queryStr));
 			return JqlQueryBuilder.newBuilder().buildQuery();
@@ -181,7 +179,7 @@ public class LinkedIssueTypeCreatedBeforeQuery extends AbstractJqlFunction {
         return parseResult.getQuery();        
     }
 	
-	private ArrayList<Long> getLinkedIssueIDs(User user, Issue issue, String issueType) {
+	private ArrayList<Long> getLinkedIssueIDs(ApplicationUser user, Issue issue, String issueType) {
 		Collection<Issue> linkedIssues = new LinkedList<Issue>();
 		ArrayList<Long> linkedIssueIDs = new ArrayList<Long>();
 		try {
@@ -193,7 +191,7 @@ public class LinkedIssueTypeCreatedBeforeQuery extends AbstractJqlFunction {
 	            if (outwardIssues != null) {
 	            	for (Issue outwardIssue : outwardIssues) {
 	                    if (outwardIssue.getCreated().before(issue.getCreated()) 
-	                    		&& outwardIssue.getIssueTypeObject().getName().contains(issueType)) {
+	                    		&& outwardIssue.getIssueType().getName().contains(issueType)) {
 	                    	//System.out.println("issue ID = " + issue.getId());
 	                    	linkedIssues.add(issue);
 	                    	linkedIssueIDs.add(issue.getId());
@@ -205,7 +203,7 @@ public class LinkedIssueTypeCreatedBeforeQuery extends AbstractJqlFunction {
 	            if (inwardIssues != null) {
 	            	for (Issue inwardIssue : inwardIssues) {
 	            		if (inwardIssue.getCreated().before(issue.getCreated()) 
-	            				&& inwardIssue.getIssueTypeObject().getName().contains(issueType)) {
+	            				&& inwardIssue.getIssueType().getName().contains(issueType)) {
 	            			//System.out.println("issue ID = " + issue.getId());
 	            			linkedIssues.add(issue);
 	            			linkedIssueIDs.add(issue.getId());
@@ -226,7 +224,7 @@ public class LinkedIssueTypeCreatedBeforeQuery extends AbstractJqlFunction {
 
 	@Override
 	@Nonnull
-	public MessageSet validate(User searcher, @Nonnull FunctionOperand operand,
+	public MessageSet validate(ApplicationUser searcherApplicationUser, @Nonnull FunctionOperand operand,
 			@Nonnull TerminalClause terminalClause) {
 		
 		//System.out.println("==== IN validate ====");
@@ -245,7 +243,6 @@ public class LinkedIssueTypeCreatedBeforeQuery extends AbstractJqlFunction {
 	    
 	    final String query = arguments.get(0);
 	    MessageSet queryMessages = new MessageSetImpl();
-	    ApplicationUser searcherApplicationUser = ApplicationUsers.from(searcher);
 	    queryMessages = validateQuery(searcherApplicationUser, query, messages);
 	    if(queryMessages.hasAnyErrors()) {
 	    	messages.addMessageSet(queryMessages);

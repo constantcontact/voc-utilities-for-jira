@@ -17,12 +17,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.avatar.Avatar;
 import com.atlassian.jira.avatar.AvatarService;
 import com.atlassian.jira.bc.issue.IssueService;
@@ -41,7 +38,6 @@ import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.LinkCollection;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.user.ApplicationUsers;
 import com.atlassian.sal.api.ApplicationProperties;
 import com.atlassian.sal.api.message.I18nResolver;
 import com.voc.jira.plugins.jira.components.ConfigurationManager;
@@ -53,8 +49,7 @@ public class VOCVolumeBuilder {
 	private final ConfigurationManager configurationManager;
 	private final IssueService issueService;
 	private final ApplicationProperties applicationProperties;
-	private ApplicationUser applicationUser;
-    private User user;
+    private ApplicationUser user;
 	private LinkCollection linkCollection;
     private IssueLinkManager issueLinkManager;
     private String baseUrl = "";
@@ -72,7 +67,7 @@ public class VOCVolumeBuilder {
 			IssueTypeManager issueTypeManager,
 			IssueService issueService,
 			JiraAuthenticationContext jiraAuthenticationContext,
-			User user,
+			ApplicationUser user,
 			SearchService searchService,
 			ApplicationProperties applicationProperties,
 			I18nResolver i18nResolver){
@@ -80,8 +75,7 @@ public class VOCVolumeBuilder {
 		this.issueLinkManager = issueLinkManager;
 	    this.configurationManager = configurationManager;
 	    this.issueService = issueService;
-	    this.applicationUser = jiraAuthenticationContext.getUser();
-	    this.user = user;
+	    this.user = jiraAuthenticationContext.getLoggedInUser();
 	    this.applicationProperties = applicationProperties;
 	    this.baseUrl = applicationProperties.getBaseUrl();
 	    this.i18n = i18nResolver;
@@ -96,7 +90,7 @@ public class VOCVolumeBuilder {
 	public Map<String, Object> getIssueProps(Issue issue){
 		Map<String, Object> issuePropsMap = new HashMap<String, Object>();
 		
-		String status = issue.getStatusObject().getName();
+		String status = issue.getStatus().getName();
     	if (status == null) { status = "none"; }
     	issuePropsMap.put("status", status);
     	
@@ -124,7 +118,7 @@ public class VOCVolumeBuilder {
 	
 	//========== VOC Request & Support Request Data ===============
 	
-	private String getHighestLevelVOCVol(Issue issue, User user, String cFieldName){
+	private String getHighestLevelVOCVol(Issue issue, ApplicationUser user, String cFieldName){
 		
 		// Get highest level option
 	    ArrayList<String> cfValues = new ArrayList<String>();
@@ -198,10 +192,10 @@ public class VOCVolumeBuilder {
 	 * @throws UnsupportedEncodingException 
 	 * @throws URISyntaxException 
 	 */
-	public Map<String, String> getIssueRowHtml(User user, String issueKey, String count, String rownum) 
+	public Map<String, String> getIssueRowHtml(ApplicationUser user, String issueKey, String count, String rownum) 
 			throws UnsupportedEncodingException, URISyntaxException{
 		Map<String, String> volValHtmlMap = new HashMap<String, String>();
-		Issue issue = getIssue(applicationUser, issueKey);
+		Issue issue = getIssue(user, issueKey);
 		volValHtmlMap = getVolumeValuesHtml(issue);
 		String escapingIcon = "";
 		if(Boolean.valueOf(volValHtmlMap.get("isEscaping"))) {
@@ -482,24 +476,24 @@ public class VOCVolumeBuilder {
 	
     private String getIssueTypeIconUrl(Issue issue) {
     	return "<img src=\"" +
-                applicationProperties.getBaseUrl() + issue.getIssueTypeObject().getIconUrl() + "\" alt=\"" +
-                issue.getIssueTypeObject().getName() + "\" width=\"16\" height=\"16\" title=\"" +
-                issue.getIssueTypeObject().getName() + "\" />";
+                applicationProperties.getBaseUrl() + issue.getIssueType().getIconUrl() + "\" alt=\"" +
+                issue.getIssueType().getName() + "\" width=\"16\" height=\"16\" title=\"" +
+                issue.getIssueType().getName() + "\" />";
     }
     
     private String getIssueLink(Issue issue) {
     	String issueKey = issue.getKey();
     	String issueLabels = "";
     	String issueComponents = "";
-    	if (issue.getResolutionObject() != null) {
+    	if (issue.getResolution() != null) {
     			issueKey = "<span class=\"issue-line-through\">" + issueKey + "</span>";
     	}
     	if (issue.getLabels() != null) {
     		issueLabels = "Labels: " + issue.getLabels().toString();
     	}
-    	if (issue.getComponentObjects() != null) {
+    	if (issue.getComponents() != null) {
     		List<String> components = new ArrayList<String>();
-    		for(ProjectComponent comp : issue.getComponentObjects()){
+    		for(ProjectComponent comp : issue.getComponents()){
     			components.add(comp.getName());
     		}
     		issueComponents = "Components: " + components.toString();
@@ -546,12 +540,12 @@ public class VOCVolumeBuilder {
     
     private String getCurrentIssuePriority(Issue issue) {
     	String strPriority = "";
-    	if(issue.getPriorityObject() != null) {
+    	if(issue.getPriority() != null) {
     		strPriority =  "<img src=\"" + applicationProperties.getBaseUrl() +
-    			issue.getPriorityObject().getIconUrl() + "\" width=\"16\" height=\"16\" alt=\"" + 
-    			issue.getPriorityObject().getName() + " " + 
-    			issue.getPriorityObject().getDescription() + "\" />" + 
-    			issue.getPriorityObject().getName();
+    			issue.getPriority().getIconUrl() + "\" width=\"16\" height=\"16\" alt=\"" + 
+    			issue.getPriority().getName() + " " + 
+    			issue.getPriority().getDescription() + "\" />" + 
+    			issue.getPriority().getName();
     	}
     	return strPriority;
     }
@@ -617,8 +611,8 @@ public class VOCVolumeBuilder {
     	String path = baseUrl + "/images/icons/user_12.gif";
     	if(issue.getAssignee() != null) {
 	    	try {
-	    		URI assigneeAvatar = avatarService.getAvatarAbsoluteURL(applicationUser, 
-		    			ApplicationUsers.from(issue.getAssignee()), Avatar.Size.SMALL);
+	    		URI assigneeAvatar = avatarService.getAvatarAbsoluteURL(user, user, Avatar.Size.SMALL);
+		    			//ApplicationUser..from(issue.getAssignee()), Avatar.Size.SMALL);
 				path = assigneeAvatar.toURL().toString();
 			} catch (MalformedURLException e) {
 				log.error("assignee avatar URL error: ", e);
@@ -648,8 +642,8 @@ public class VOCVolumeBuilder {
     
     private String getIssueRowCssClass(Issue issue) {
     	String strIssueRowColor = "issuerow";
-    	if(issue.getStatusObject()!= null && 
-    			Integer.parseInt(issue.getStatusObject().getId()) == 
+    	if(issue.getStatus()!= null && 
+    			Integer.parseInt(issue.getStatus().getId()) == 
     			IssueFieldConstants.CLOSED_STATUS_ID) {
     		strIssueRowColor += " issuerow-closed";
     	}
@@ -709,7 +703,7 @@ public class VOCVolumeBuilder {
     
     private boolean isBizCritical(Issue issue){
     	try {
-			if (String.valueOf(issue.getPriorityObject().getSequence()).matches(".*[123].*") &&
+			if (String.valueOf(issue.getPriority().getSequence()).matches(".*[123].*") &&
 					getIssueCustomFieldValue(issue,SelectSeverityField.getSeverityFieldName())
 					.matches(".*[Unusable|Painful|Annoying].*")) {
 				return true;

@@ -123,7 +123,7 @@ public class MailSendPostFunction extends AbstractJiraFunctionProvider {
         if (shouldNotify) {
             log.debug("[" + issue.getKey() + "] MailSendPostFunction should send mail...");
 
-            User updatedByUser = getCaller(transientVars, args);
+            ApplicationUser updatedByUser = getCaller(transientVars, args);
 
             String currentAssigneeLink = "";
             if (issue.getAssignee() != null) {
@@ -206,8 +206,8 @@ public class MailSendPostFunction extends AbstractJiraFunctionProvider {
         }
     }
 
-    private boolean matchesJql(String jql, Issue issue, User caller) {
-        SearchService.ParseResult parseResult = searchService.parseQuery(caller, jql);
+    private boolean matchesJql(String jql, Issue issue, ApplicationUser user) {
+        SearchService.ParseResult parseResult = searchService.parseQuery(user, jql);
         if (parseResult.isValid()) {
             Query query = JqlQueryBuilder.newBuilder(parseResult.getQuery())
                     .where()
@@ -216,7 +216,7 @@ public class MailSendPostFunction extends AbstractJiraFunctionProvider {
                     .eq(issue.getKey())
                     .buildQuery();
             try {
-                return searchService.searchCount(caller, query) > 0;
+                return searchService.searchCount(user, query) > 0;
             } catch (SearchException e) {
                 log.error("Error processing JQL: " + e.getMessage(), e);
                 return false;
@@ -270,10 +270,10 @@ public class MailSendPostFunction extends AbstractJiraFunctionProvider {
     }
 
     private String getIssueTypeIconUrl(Issue issue) {
-    	if(issue.getIssueTypeObject() != null) {    		
+    	if(issue.getIssueType() != null) {    		
 	        return "<img src=\"" +
-	                applicationProperties.getBaseUrl() + issue.getIssueTypeObject().getIconUrl() + "\" alt=\"" +
-	                issue.getIssueTypeObject().getName() + "\" width=16 height=16 />"; 
+	                applicationProperties.getBaseUrl() + issue.getIssueType().getIconUrl() + "\" alt=\"" +
+	                issue.getIssueType().getName() + "\" width=16 height=16 />"; 
         }
     	else {
     		return "";
@@ -283,8 +283,8 @@ public class MailSendPostFunction extends AbstractJiraFunctionProvider {
 	private String getIssueLink(Issue issue) {
 		if(issue != null){
 			String issueKey = issue.getKey();
-			if(issue.getResolutionObject() != null){
-				if (issue.getResolutionObject().getGenericValue() != null) {
+			if(issue.getResolution() != null){
+				if (((Issue) issue.getResolution()) != null) {
 					issueKey = "<span style=\"text-decoration:line-through;\">" + issueKey + "</span>";
         		}
 			}
@@ -303,16 +303,16 @@ public class MailSendPostFunction extends AbstractJiraFunctionProvider {
 
     private String getCurrentIssuePriority(Issue issue) {
         return "<img src=\"" + applicationProperties.getBaseUrl() +
-                issue.getPriorityObject().getIconUrl() + "\" width=16 height=16 alt=\"" + issue.getPriorityObject().getName() + " " +
-                issue.getPriorityObject().getDescription() + "\" />" +
-                issue.getPriorityObject().getName();                
+                issue.getPriority().getIconUrl() + "\" width=16 height=16 alt=\"" + issue.getPriority().getName() + " " +
+                issue.getPriority().getDescription() + "\" />" +
+                issue.getPriority().getName();                
     }
 
-    @SuppressWarnings("deprecation")
+    //@SuppressWarnings("deprecation")
 	private String getCurrentIssueStatus(Issue issue) {
         return "<img src=\"" + applicationProperties.getBaseUrl() +        		
-                issue.getStatusObject().getIconUrl() + "\" width=16 height=16 alt=\"" + issue.getStatusObject().getDescription() + "\" />" +
-                issue.getStatusObject().getName();
+                issue.getStatus().getIconUrlHtml() + "\" width=16 height=16 alt=\"" + issue.getStatus().getDescription() + "\" />" +
+                issue.getStatus().getName();
     }
 
     private String getUserProfileLink(String name, String displayName) {
@@ -350,9 +350,9 @@ public class MailSendPostFunction extends AbstractJiraFunctionProvider {
                 , "/secure/ViewProfile.jspa?name=", issue.getReporterId());
     }
 
-    @SuppressWarnings("deprecation")
+    //@SuppressWarnings("deprecation")
 	private String getReporterAvatar(Issue issue) {
-        URI reporterAvatar = avatarService.getAvatarAbsoluteURL(issue.getReporter(), issue.getReporterId(), Avatar.Size.SMALL);
+        URI reporterAvatar = avatarService.getAvatarAbsoluteURL(issue.getReporter(), issue.getReporter(), Avatar.Size.SMALL);
         String reporterAvatarURL = "";
         try {
             reporterAvatarURL = "<a href=\"" + getReporterProfileURL(issue) + "\"><img src=\"" +
@@ -385,9 +385,9 @@ public class MailSendPostFunction extends AbstractJiraFunctionProvider {
         }
     }
 
-    @SuppressWarnings("deprecation")
+    //@SuppressWarnings("deprecation")
 	private String getAssigneeAvatar(Issue issue) {
-        URI assigneeAvatar = avatarService.getAvatarAbsoluteURL(issue.getAssignee(), issue.getAssigneeId(), Avatar.Size.SMALL);
+        URI assigneeAvatar = avatarService.getAvatarAbsoluteURL(issue.getAssignee(), issue.getAssignee(), Avatar.Size.SMALL);
         String assigneeAvatarURL = "";
         try {
             assigneeAvatarURL = "<a href=\"" + getAssigneeProfileURL(issue) + "\"><img src=\"" +
@@ -426,10 +426,10 @@ public class MailSendPostFunction extends AbstractJiraFunctionProvider {
     /*
      * Create list of linked issues
      */
-    private String createLinkedIssuesSection(Issue issue, User user, Map<String, Object> args) {
+    private String createLinkedIssuesSection(Issue issue, ApplicationUser updatedByUser, Map<String, Object> args) {
         String linkedIssuesString = "";
         try {
-            linkCollection = issueLinkManager.getLinkCollection(issue, user);
+            linkCollection = issueLinkManager.getLinkCollection(issue, updatedByUser);
             StringBuilder linkedIssuesBuilder = new StringBuilder();
             Set<IssueLinkType> linkTypes = linkCollection.getLinkTypes();
             if (linkTypes != null) {

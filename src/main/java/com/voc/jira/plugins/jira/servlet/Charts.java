@@ -69,7 +69,7 @@ public class Charts extends HttpServlet implements IErrorKeeper {
 	private static final Logger log = LoggerFactory.getLogger(Charts.class);
     private final UserManager userManager;
     private final TemplateRenderer renderer;
-    private final User user;
+    private final ApplicationUser user;
     private final com.atlassian.jira.user.util.UserManager jiraUserManager;
     private final ProjectManager projectManager;
     private final I18nResolver i18n;
@@ -115,9 +115,8 @@ public class Charts extends HttpServlet implements IErrorKeeper {
         this.jiraUserManager = jiraUserManager;
         this.i18n = i18n;
         this.webResourceManager = webResourceManager;
-        ApplicationUser applicationUser = jiraAuthenticationContext.getUser();
         this.projectManager = ComponentAccessor.getProjectManager();
-        this.user = applicationUser.getDirectoryUser();
+        this.user = jiraAuthenticationContext.getLoggedInUser();
         this.searchService = searchService;
 	    this.baseUrl = applicationProperties.getBaseUrl();
 	    this.userManager = userManager;

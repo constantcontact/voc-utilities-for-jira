@@ -7,10 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.ofbiz.core.entity.GenericEntityException;
-import org.ofbiz.core.entity.GenericValue;
-
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.ConstantsManager;
 import com.atlassian.jira.issue.CustomFieldManager;
@@ -117,11 +114,11 @@ public abstract class SingleTextField<T, S> extends AbstractSingleFieldType<Obje
 			System.out.println(SEVERITY_FIELD_NAME + " field does not yet exist");
 			ArrayList<JiraContextNode> contexts = new ArrayList<JiraContextNode>();
 	        contexts.add(GlobalIssueContext.getInstance());
-	        ArrayList<GenericValue> issueTypes = new ArrayList<GenericValue>();
+	        List<IssueType> issueTypes = new ArrayList<IssueType>();
 			for(IssueConstant currentIssueType : allIssueTypeObjects) {
 			    if(currentIssueType.getName().equals("Defect") || currentIssueType.getName().equals("Bug")) {
 			    	System.out.println("found issueType 'Defect' or 'Bug'");
-			        issueTypes.add(currentIssueType.getGenericValue());
+			        issueTypes.add((IssueType) ((Option) currentIssueType).getGenericValue());
 			    }
 			}
 	        
