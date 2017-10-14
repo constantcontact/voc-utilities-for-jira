@@ -19,6 +19,7 @@ public class ConfigurationManager {
     private static final String LOW_GUIDANCE = "lowGuidance";
     private static final String MEMCACHED_SERVER_HOST = "memcachedServerHost";
     private static final String MEMCACHED_SERVER_PORT = "memcachedServerPort";
+    private static final String REFRESH_MEMCACHED = "refreshMemcached";
     private static final String VOC_REQUEST = "VOC Request";
     private static final String SUPPORT_REQUEST = "Support Request";
     private static final String CREATE_SEVERITY = "createSeverity";
@@ -160,6 +161,11 @@ public class ConfigurationManager {
         	return storedValue == null || storedValue == "" ? SMTP_SERVER : storedValue.toString();
         }
         return storedValue == null ? "" : storedValue.toString();
+    }
+    
+    public void setMemcachedResetNeeded(String truthy) {
+    	PluginSettings settings = pluginSettingsFactory.createSettingsForKey(PLUGIN_STORAGE_KEY);
+    	settings.put(REFRESH_MEMCACHED, truthy);
     }
 
     public void updateConfiguration(String smtpServer, String issuetypesJQL, String jql, String isVisible, 

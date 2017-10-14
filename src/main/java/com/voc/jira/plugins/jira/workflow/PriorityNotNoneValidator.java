@@ -30,12 +30,12 @@ public class PriorityNotNoneValidator implements Validator
       Issue issue = (Issue) transientVars.get(ISSUE);
       String errorMsg = "Priority must be changed from the default value '"
           + PRIORITY_DEFAULT + "' for all 'Defect' issues.";
-      if(defectTypes.contains(issue.getIssueTypeObject().getName())){
-	    log.info(issue.getIssueTypeObject().getName()
+      if(defectTypes.contains(issue.getIssueType().getName())){
+	    log.info(issue.getIssueType().getName()
 	        + " IssueType is one of the known defect issue types collection.");
 	    InvalidInputException ex = new InvalidInputException();
 	   	    
-	    if(null ==  issue.getPriorityObject().getGenericValue() || PRIORITY_DEFAULT.equals( issue.getPriorityObject().getGenericValue().getString("name"))) {
+	    if(null == (issue.getPriority()) || PRIORITY_DEFAULT.equals( (issue.getPriority()).getName())) {
 	      ex.addError(errorMsg);
 	      ex.addError(PRIORITY,errorMsg);
 		  if ( ex.getErrors() != null ) {

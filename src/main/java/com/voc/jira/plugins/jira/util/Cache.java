@@ -30,7 +30,22 @@ public class Cache {
 		if(r.isMemcached()) {
 			c = CachePool.getInstance(r.host(), r.port()).getClient();
 		}
+		//System.out.println("MemcachedClient Available Servers: " + c.getAvailableServers());
+		//System.out.println("MemcachedClient Unavailable Servers: " + c.getUnavailableServers());
 		return get(r,c);
+	}
+	
+	public void shutdown(ICacheRequest r) {
+		MemcachedClient c = null;
+		if(r.isMemcached()) {
+			c = CachePool.getInstance(r.host(), r.port()).getClient();
+		}
+		/*
+		final String key = r.key().replaceAll(" ", "_");
+		Future<Object> future = c.asyncGet(key);
+		Object result = future.cancel(false);
+		*/
+		c.shutdown();
 	}
 	
 	static Object get(ICacheRequest r, MemcachedClient c) {
@@ -49,6 +64,7 @@ public class Cache {
 			}
 			return result;
 		} catch (Exception e) {
+			log.error(String.format("ERROR - Cache.get() - client future Exception() thrown (%s)", e.getMessage()));
 			Object val = r.transform(r.get());
 			try {
 				c.set(key, getTtl(r), val);
@@ -61,5 +77,9 @@ public class Cache {
 	
 	private static int getTtl(ICacheRequest r) {
 		return r.ttlSecs() > 0 ? r.ttlSecs() : Time.secondsRemainingTillMidnight();
+	}
+	
+	public void connectionLost(java.net.SocketAddress sa) {
+		System.out.println("Cache.connectionLost SocketAddress: " + sa);
 	}
 }

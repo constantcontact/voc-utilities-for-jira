@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.voc.jira.plugins</groupId>
     <artifactId>VOC-Utilities</artifactId>
-    <version>3.0.1</version>
+    <version>4.0.1-Jira7</version>
     <organization>
         <name>David Jellison</name>
         <url>https://github.com/constantcontact/voc-utilities-for-jira/wiki</url>
@@ -23,6 +23,7 @@
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.3</version>
+            <!-- <version>3.0.1</version> -->
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -36,6 +37,7 @@
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-api</artifactId>
             <version>${jira.version}</version>
+            <!-- <version>7.0.0-m01b</version> -->
             <scope>provided</scope>
         </dependency>
         <!-- Add dependency on jira-core if you want access to JIRA implementation classes as well as the sanctioned API. -->
@@ -70,6 +72,7 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.1.1</version>
+            <!-- <version>4.2.3</version> -->
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -114,12 +117,11 @@
                 <configuration>
                     <productVersion>${jira.version}</productVersion>
                     <productDataVersion>${jira.version}</productDataVersion>
-                    <!-- <productDataPath>${basedir}/src/test/resources/generated-test-resources.zip</productDataPath> -->
+                    <productDataPath>${basedir}/src/test/resources/generated-test-resources.zip</productDataPath>
                     <!-- <output>${build.directory}/voc-utilities.log</output> -->
                     <systemPropertyVariables>
                         <atlassian.mail.senddisabled>false</atlassian.mail.senddisabled>
                     </systemPropertyVariables>
-                    <instructions/>
                     <!-- <log4jProperties>src/main/resources/log4j.properties</log4jProperties> -->
                     <enableQuickReload>true</enableQuickReload>
                     <enableFastdev>false</enableFastdev>
@@ -139,15 +141,16 @@
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
         </plugins>
     </build>
     <properties>
-        <jira.version>6.4.1</jira.version>
+        <jira.version>7.5.0</jira.version>
         <amps.version>6.2.11</amps.version>
         <plugin.testrunner.version>1.1</plugin.testrunner.version>
         <template.renderer.version>1.3.1</template.renderer.version>

@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.atlassian.crowd.embedded.api.User;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.issue.CustomFieldManager;
 import com.atlassian.jira.issue.Issue;
@@ -16,6 +14,7 @@ import com.atlassian.jira.issue.search.SearchException;
 import com.atlassian.jira.jql.builder.JqlQueryBuilder;
 import com.atlassian.jira.plugin.webfragment.contextproviders.AbstractJiraContextProvider;
 import com.atlassian.jira.plugin.webfragment.model.JiraHelper;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.query.Query;
 import com.atlassian.sal.api.ApplicationProperties;
 import com.voc.jira.plugins.jira.components.ConfigurationManager;
@@ -28,7 +27,7 @@ import com.voc.jira.plugins.jira.customfield.SelectSeverityField;
  */
 //@SuppressWarnings("unchecked")
 public class IssueGuidanceWebPanel extends AbstractJiraContextProvider {
-	private static final Logger log = LoggerFactory.getLogger(IssueGuidanceWebPanel.class);
+	//private static final Logger log = LoggerFactory.getLogger(IssueGuidanceWebPanel.class);
 	private final CustomFieldManager customFieldManager;
 	private final ConfigurationManager configurationManager;
 	private final SearchService searchService;
@@ -51,24 +50,23 @@ public class IssueGuidanceWebPanel extends AbstractJiraContextProvider {
 	    this.baseUrl = applicationProperties.getBaseUrl();
 	}
     
-	@Override
-    public Map<String, Object> getContextMap(User user, JiraHelper jiraHelper) {
+	public Map<String, Object> getContextMap(ApplicationUser user, JiraHelper jiraHelper) {
 		Issue issue = (Issue) jiraHelper.getContextParams().get("issue");
 		String jql = configurationManager.getJQL();
 		Map<String, Object> contextMap = new HashMap<String, Object>();
 		
-		String status = issue.getStatusObject().getName();
+		String status = issue.getStatus().getName();
     	if (status != null) {
     		contextMap.put("status", status);
     	}
 		
 		// Weighted Priority & Resolution Guidance
-		if(defectTypes.contains(issue.getIssueTypeObject().getName())){
-		    log.info(issue.getIssueTypeObject().getName()
-		        + " IssueType is one of the known defect issue types collection.");
+		if(defectTypes.contains(issue.getIssueType().getName())){
+		    //log.info(issue.getIssueType().getName()
+		    //    + " IssueType is one of the known defect issue types collection.");
 		    contextMap.put("baseUrl", baseUrl);
 	    	
-		    String issueType = issue.getIssueTypeObject().getName();
+		    String issueType = issue.getIssueType().getName();
 		    if (issueType != null) {
 		    	contextMap.put("issueType", issueType);
 		    }
@@ -90,7 +88,7 @@ public class IssueGuidanceWebPanel extends AbstractJiraContextProvider {
 	    		contextMap.put("isVisible", "no");
 	    	}
 		    
-		    String priority = issue.getPriorityObject().getName();		    		
+		    String priority = issue.getPriority().getName();		    		
 	    	if (priority != null) {
 	    		contextMap.put("priority", priority);
 	    	}
@@ -108,14 +106,14 @@ public class IssueGuidanceWebPanel extends AbstractJiraContextProvider {
 	    					SelectSeverityField.getSeverityFieldName()));
 	    		}
 	    	} catch(NullPointerException e) {
-	    		log.error(String.format("Missing custom field \"%s\".",SelectSeverityField.getSeverityFieldName()), e);
+	    		//log.error(String.format("Missing custom field \"%s\".",SelectSeverityField.getSeverityFieldName()), e);
 	    		contextMap.put("messageError", String.format("Missing custom field \"%s\". Contact your Jira Administrator.",
 	    				SelectSeverityField.getSeverityFieldName()));
 	    		e.printStackTrace();
 	    	}
 	    	
-	    	if (issue.getResolutionObject() != null){
-	    		Object resolution = issue.getResolutionObject().getName();
+	    	if (issue.getResolution() != null){
+	    		Object resolution = issue.getResolution().getName();
 		    	Object resolutionDate = issue.getResolutionDate();
 		    	if (resolution == null) {
 		    		resolution = "Unresolved";
@@ -140,7 +138,7 @@ public class IssueGuidanceWebPanel extends AbstractJiraContextProvider {
     	return contextMap;
     }
 	
-    private boolean matchesJql(String jql, Issue issue, User caller) {
+    private boolean matchesJql(String jql, Issue issue, ApplicationUser caller) {
         SearchService.ParseResult parseResult = searchService.parseQuery(caller, jql);
         if (parseResult.isValid()) {
             Query query = JqlQueryBuilder.newBuilder(parseResult.getQuery())
@@ -152,7 +150,7 @@ public class IssueGuidanceWebPanel extends AbstractJiraContextProvider {
             try {
                 return searchService.searchCount(caller, query) > 0;
             } catch (SearchException e) {
-                log.error("Error processing JQL: " + e.getMessage(), e);
+                //log.error("Error processing JQL: " + e.getMessage(), e);
                 return false;
             }
         }

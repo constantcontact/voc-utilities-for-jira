@@ -1,9 +1,9 @@
 voc-utilities-for-jira
 =======================
 
-## Jira 6.x plugin
+## Jira 7.x plugin
 
-VOC Utilities plugin for Jira 6.x is a collection of features specific to the Voice Of Customer (VoC) and Escaping Defect Management. See the VOC Utilities wiki [here](https://github.com/constantcontact/voc-utilities-for-jira/wiki)
+VOC Utilities plugin for Jira 7.x is a collection of features specific to the Voice Of Customer (VoC) and Escaping Defect Management. See the VOC Utilities wiki [here](https://github.com/constantcontact/voc-utilities-for-jira/wiki)
 
 ## Modules
 ### Workflow
@@ -21,6 +21,16 @@ VOC Utilities plugin for Jira 6.x is a collection of features specific to the Vo
 - "VOC Created and Resolved" adds a Dashboard Gadget that illustrates found vs. resolved and aging over time horizons
 
 ## Build History
+
+### version 4.0.1-Jira7
+<ol>
+  <li>Support for Jira v7.5.0</li>
+</ol>
+
+### version 4.0.0-Jira7
+<ol>
+  <li>Refactor for Jira v7.0.0</li>
+</ol>
 
 ### version 3.0.1
 <ol>

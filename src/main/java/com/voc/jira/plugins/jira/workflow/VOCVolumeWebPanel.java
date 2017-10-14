@@ -11,7 +11,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.config.IssueTypeManager;
 import com.atlassian.jira.issue.CustomFieldManager;
@@ -24,6 +23,7 @@ import com.atlassian.jira.issue.search.SearchException;
 import com.atlassian.jira.jql.builder.JqlQueryBuilder;
 import com.atlassian.jira.plugin.webfragment.contextproviders.AbstractJiraContextProvider;
 import com.atlassian.jira.plugin.webfragment.model.JiraHelper;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.query.Query;
 import com.atlassian.sal.api.ApplicationProperties;
 import com.voc.jira.plugins.jira.components.ConfigurationManager;
@@ -76,15 +76,15 @@ public class VOCVolumeWebPanel extends AbstractJiraContextProvider {
 	    this.configurationManager = configurationManager;
 	    this.searchService = searchService;
 	    this.baseUrl = applicationProperties.getBaseUrl();
+	    System.out.println("INITIALIZED VOCVolumeWebPanel.java");
 	}
     
-	@Override
-    public Map<String, Object> getContextMap(User user, JiraHelper jiraHelper) {
+	public Map<String, Object> getContextMap(ApplicationUser user, JiraHelper jiraHelper) {
 		Issue issue = (Issue) jiraHelper.getContextParams().get("issue");
 		String jql = configurationManager.getJQL();
 		Map<String, Object> contextMap = new HashMap<String, Object>();
 		
-		String status = issue.getStatusObject().getName();
+		String status = issue.getStatus().getName();
     	if (status != null) {
     		contextMap.put("status", status);
     	}
@@ -115,7 +115,7 @@ public class VOCVolumeWebPanel extends AbstractJiraContextProvider {
     	if(isVisible.contains("yes")) {
 		    contextMap.put("baseUrl", baseUrl);
 	    	
-		    String issueType = issue.getIssueTypeObject().getName();
+		    String issueType = issue.getIssueType().getName();
 		    if (issueType != null) {
 		    	contextMap.put("issueType", issueType);
 		    }
@@ -190,8 +190,8 @@ public class VOCVolumeWebPanel extends AbstractJiraContextProvider {
     	return contextMap;
     }
 	
-    private boolean matchesJql(String jql, Issue issue, User caller) {
-        SearchService.ParseResult parseResult = searchService.parseQuery(caller, jql);
+    private boolean matchesJql(String jql, Issue issue, ApplicationUser user) {
+        SearchService.ParseResult parseResult = searchService.parseQuery(user, jql);
         if (parseResult.isValid()) {
             Query query = JqlQueryBuilder.newBuilder(parseResult.getQuery())
                     .where()
@@ -200,7 +200,7 @@ public class VOCVolumeWebPanel extends AbstractJiraContextProvider {
                     .eq(issue.getKey())
                     .buildQuery();
             try {
-                return searchService.searchCount(caller, query) > 0;
+                return searchService.searchCount(user, query) > 0;
             } catch (SearchException e) {
                 log.error("Error processing JQL: " + e.getMessage(), e);
                 return false;
@@ -223,7 +223,7 @@ public class VOCVolumeWebPanel extends AbstractJiraContextProvider {
         return strCFValue;
 	}
 	
-	private boolean hasIssuetypeLinks(Issue issue, User user, String issuetypeName){
+	private boolean hasIssuetypeLinks(Issue issue, ApplicationUser user, String issuetypeName){
 	    boolean linkedIssuetypeFound = false;
 	    try{
 	    	linkCollection = issueLinkManager.getLinkCollection(issue, user);
@@ -231,7 +231,7 @@ public class VOCVolumeWebPanel extends AbstractJiraContextProvider {
 	        Iterator<Issue> it = linkedIssues.iterator();
 	        while(it.hasNext()) {
 	        	Issue linkedIssue = (Issue) it.next();
-	        	if(linkedIssue.getIssueTypeObject().getName().contains(issuetypeName)){
+	        	if(linkedIssue.getIssueType().getName().contains(issuetypeName)){
 	        		linkedIssuetypeFound = true;
 	        	}
 	        }
@@ -242,7 +242,7 @@ public class VOCVolumeWebPanel extends AbstractJiraContextProvider {
 	    return linkedIssuetypeFound;
 	}
 	
-	private String getHighestLevelVOCVol(Issue issue, User user, String cfName){
+	private String getHighestLevelVOCVol(Issue issue, ApplicationUser user, String cfName){
 	
 		// Get highest level option
 	    ArrayList<String> cfValues = new ArrayList<String>();
@@ -294,15 +294,15 @@ public class VOCVolumeWebPanel extends AbstractJiraContextProvider {
 	    return cfHighestValue;
 	}
 	
-	private Map<String,Object> getAllLinkedCustomFields(Issue issue, User user, String cfCountValue) {
+	private Map<String,Object> getAllLinkedCustomFields(Issue issue, ApplicationUser user, String cfCountValue) {
 		return getAllLinkedCustomFields(issue, user, cfCountValue, "", "");
 	}
 	
-	private Map<String,Object> getAllLinkedCustomFields(Issue issue, User user, String cfCountValue, String cfLabelName) {
+	private Map<String,Object> getAllLinkedCustomFields(Issue issue, ApplicationUser user, String cfCountValue, String cfLabelName) {
 		return getAllLinkedCustomFields(issue, user, cfCountValue, cfLabelName, "");
 	}
 
-	private Map<String,Object> getAllLinkedCustomFields(Issue issue, User user, String cfCountValue, String cfLabelName, String cfOtherSelect) {
+	private Map<String,Object> getAllLinkedCustomFields(Issue issue, ApplicationUser user, String cfCountValue, String cfLabelName, String cfOtherSelect) {
 		
 		// Get accumulative count for a custom field in all linked issues with this field
 	    ArrayList<Map<String,Object>> cfValuesMapList = new ArrayList<Map<String,Object>>();

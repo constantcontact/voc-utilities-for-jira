@@ -9,19 +9,15 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.NullArgumentException;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.IssueService;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.bc.project.ProjectService;
@@ -50,7 +46,7 @@ public class VOCVolume extends HttpServlet {
     private SearchService searchService;
     private UserManager userManager;
     private TemplateRenderer renderer;
-    private User user;
+    private ApplicationUser user;
     private Query query;
     private Integer numIssuesLimit = 10;
     private Integer numResultsLimit = 10;
@@ -105,8 +101,7 @@ public class VOCVolume extends HttpServlet {
         this.jiraUserManager = jiraUserManager;
         this.i18n = i18n;
         this.webResourceManager = webResourceManager;
-        ApplicationUser applicationUser = jiraAuthenticationContext.getUser();
-        this.user = applicationUser.getDirectoryUser();
+        this.user = jiraAuthenticationContext.getLoggedInUser();
         this.query = JqlQueryBuilder.newBuilder().buildQuery();
         this.vocVolumeBuilder = new VOCVolumeBuilder(
         		customFieldManager, issueLinkManager, configurationManager, 
@@ -183,7 +178,7 @@ public class VOCVolume extends HttpServlet {
     private List<String> getIssuesRows(HttpServletRequest req) 
     		throws UnsupportedEncodingException, NullArgumentException {
         // User is required to carry out a search
-        User user = getCurrentUser(req);
+        ApplicationUser user = getCurrentUser(req);
         List<String> rows = new ArrayList<String>();
         //Map<String, String> rowMap = Maps.newHashMap();
         
@@ -265,8 +260,8 @@ public class VOCVolume extends HttpServlet {
      * @param req
      * @return
      */
-    private User getCurrentUser(HttpServletRequest req) {
-        return jiraUserManager.getUserByName(userManager.getRemoteUsername(req)).getDirectoryUser();
+    private ApplicationUser getCurrentUser(HttpServletRequest req) {
+        return jiraUserManager.getUserByName(userManager.getRemoteUsername(req));
     }
     
     /**

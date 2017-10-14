@@ -3,7 +3,6 @@ package com.voc.jira.plugins.jira.servlet;
 import com.voc.jira.plugins.jira.components.ConfigurationManager;
 import com.voc.jira.plugins.jira.customfield.SelectSeverityField;
 import com.voc.jira.plugins.jira.util.Jql;
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.CustomFieldManager;
@@ -13,6 +12,7 @@ import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.fields.config.FieldConfig;
 import com.atlassian.jira.issue.fields.config.FieldConfigScheme;
 import com.atlassian.jira.issue.search.SearchException;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.UserUtils;
 import com.atlassian.plugin.webresource.UrlMode;
 import com.atlassian.plugin.webresource.WebResourceUrlProvider;
@@ -98,7 +98,7 @@ public class ConfigVOCVolumeAdminServlet extends HttpServlet implements ActionLi
 			return;
 		}
 
-		User user = UserUtils.getUser(username);
+		ApplicationUser user = UserUtils.getUser(username);
 
 		resp.setContentType("text/html;charset=utf-8");
 		Map<String, Object> context = Maps.newHashMap();
@@ -116,6 +116,7 @@ public class ConfigVOCVolumeAdminServlet extends HttpServlet implements ActionLi
 			System.out.println("getIsMemcached() == yes");
 			context.put("isMemcached", "yes");
 		} else {
+			System.out.println("getIsMemcached() == no");
 			context.put("isMemcached", "no");
 		}
 		if (isCustomFieldPresent("Uservoice")) {
@@ -204,9 +205,36 @@ public class ConfigVOCVolumeAdminServlet extends HttpServlet implements ActionLi
 			return;
 		}
 		
+		if (diffMemcachedHostPort(
+				req.getParameter("memcachedServerHost"), 
+				configurationManager.getMemcachedServerHost(), 
+				req.getParameter("memcachedServerPort"), 
+				configurationManager.getMemcachedServerPort())) {
+			System.out.println("Memcached Host:Port differences found");
+			//TODO: set shut down prior cache configuration host:port
+			configurationManager.setMemcachedResetNeeded("true");
+			
+			//[WARNING] [talledLocalContainer] 2017-05-07 09:51:51.384 WARN net.spy.memcached.MemcachedConnection:  
+			//   Closing, and reopening {QA sa=localhost/127.0.0.1:11212, #Rops=0, #Wops=6, #iq=0, topRop=null, 
+			//     topWop=Cmd: get Keys: localhost:c&t:esc:idsExp: 0, toWrite=0, interested=0}, attempt 45.
+			//
+			//== IN ConfigVOCVolumeAdminServlet CachePool == {localhost/127.0.0.1:11212={}}
+			//System.out.println("CachePool Stats: " + 
+			//		CachePool.getInstance(configurationManager.getMemcachedServerHost(), 
+			//		configurationManager.getMemcachedServerPort()).getClient().getStats());
+			//CachePool.getInstance(configurationManager.getMemcachedServerHost(), 
+			//		configurationManager.getMemcachedServerPort()).getClient().
+		} else {
+			//System.out.println("NO Memcached Host:Port differences found");
+			configurationManager.setMemcachedResetNeeded("false");
+			//System.out.println("CachePool Stats: " + 
+			//		CachePool.getInstance(configurationManager.getMemcachedServerHost(), 
+			//		configurationManager.getMemcachedServerPort()).getClient().getStats());
+		}
+		
 		//System.out.println("doPost req isMemcached == " + req.getParameter("isMemcached"));
 
-		User user = UserUtils.getUser(username);
+		ApplicationUser user = UserUtils.getUser(username);
 
 		resp.setContentType("text/html;charset=utf-8");
 		Map<String, Object> context = Maps.newHashMap();
@@ -250,8 +278,10 @@ public class ConfigVOCVolumeAdminServlet extends HttpServlet implements ActionLi
 			context.put("isVisible", "no");
 		}
 		if (configurationManager.getIsMemcached().contains("yes")) {
+			System.out.println("getIsMemcached() == yes");
 			context.put("isMemcached", "yes");
 		} else {
+			System.out.println("getIsMemcached() == no");
 			context.put("isMemcached", "no");
 		}
 		if (isCustomFieldPresent("Uservoice")) {
@@ -385,7 +415,7 @@ public class ConfigVOCVolumeAdminServlet extends HttpServlet implements ActionLi
 		return URI.create(builder.toString());
 	}
 
-	private String validateJql(String jql, User user) {
+	private String validateJql(String jql, ApplicationUser user) {
 		SearchService searchService = ComponentAccessor
 				.getComponentOfType(SearchService.class);
 		SearchService.ParseResult parseResult = searchService.parseQuery(user,
@@ -404,6 +434,19 @@ public class ConfigVOCVolumeAdminServlet extends HttpServlet implements ActionLi
 		}
 
 		return "no";
+	}
+	
+	private boolean diffMemcachedHostPort(
+			String newMcHost, String storedMcHost, 
+			String newMcPort, String storedMcPort) {
+		
+		System.out.println("newMcHost == " + newMcHost.trim());
+		System.out.println("storedMcHost == " + storedMcHost.trim());
+		System.out.println("newMcPort == " + newMcPort.trim());
+		System.out.println("storedMcPort == " + storedMcPort.trim());
+		
+		return newMcHost.trim().equalsIgnoreCase(storedMcHost.trim()) &&
+		newMcPort.trim().equalsIgnoreCase(storedMcPort.trim()) ? false : true;
 	}
 
 	@Override
