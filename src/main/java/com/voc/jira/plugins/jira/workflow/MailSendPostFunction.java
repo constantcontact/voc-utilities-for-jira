@@ -330,10 +330,12 @@ public class MailSendPostFunction extends AbstractJiraFunctionProvider {
             return "None";
         }
         Object v = cf.getValue(issue);
+        /* User suppressed to ApplicationUser in 7.x
         if (v instanceof User) {
             User u = (User) v;
             return getUserProfileLink(u.getName(), u.getDisplayName());
         }
+        */
         if (v instanceof ApplicationUser) {
             ApplicationUser a = (ApplicationUser) v;
             return getUserProfileLink(a.getName(), a.getDisplayName());

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.voc.jira.plugins</groupId>
     <artifactId>VOC-Utilities</artifactId>
-    <version>4.0.0-Jira7</version>
+    <version>4.0.1-Jira7</version>
     <organization>
         <name>David Jellison</name>
         <url>https://github.com/constantcontact/voc-utilities-for-jira/wiki</url>
@@ -150,7 +150,7 @@
         </plugins>
     </build>
     <properties>
-        <jira.version>7.0.0</jira.version>
+        <jira.version>7.5.0</jira.version>
         <amps.version>6.2.11</amps.version>
         <plugin.testrunner.version>1.1</plugin.testrunner.version>
         <template.renderer.version>1.3.1</template.renderer.version>

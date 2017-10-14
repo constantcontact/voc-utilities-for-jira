@@ -5,6 +5,7 @@
  */
 package com.voc.jira.plugins.jira.servlet;
 //TODO: Create a data builder object for all charts and include here
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -14,19 +15,15 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.plugin.webresource.JiraWebResourceManager;
@@ -166,7 +163,6 @@ public class Charts extends HttpServlet implements IErrorKeeper {
         	totalFound += nFnd + nEsc;
         	log("adding " + (nFnd + nEsc),context);
         	log("total now " +totalFound,context);
-        	
     	}
     	log("data.size() " + data.size(),context);
         
@@ -284,7 +280,7 @@ public class Charts extends HttpServlet implements IErrorKeeper {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
     						throws ServletException, IOException {
        try {
-			Map<String, Object> context = ServletResponse.setup(resp, webResourceManager);
+    	    Map<String, Object> context = ServletResponse.setup(resp, webResourceManager);
 	    	StringBuilder timings = new StringBuilder();
         	List<String> projectInfo = Projects.getProjects(req,projectManager);
 	    	final String projectClause = projectInfo.get(0);
@@ -310,8 +306,9 @@ public class Charts extends HttpServlet implements IErrorKeeper {
 			context.put(BUSINESS_CRITICAL, true);
 	    	final String customJql = Param.getCustomJql(req,context,this,searchService,user);
            	final String cfData = Json.get(getDataSetWithSeparateQueries(false,timings,projectClause,beginDate,endDate,useHardCodedData,customJql,context,doCustomerFacing(which)));
+    	    //System.out.println("IN CHARTS DOGET after data string cfData");
            	final String bcData = Json.get(getDataSetWithSeparateQueries(true,timings,projectClause,beginDate,endDate,useHardCodedData,customJql,context,doBusinessCritical(which)));
-	       	context.put("cfData", cfData);
+           	context.put("cfData", cfData);
 	    	context.put("bcData", bcData);
 	        String[] cfColors = {colorCFEscaping,colorCFCustFound,colorCFCustFacing};
 	        context.put("cfColors", Json.get(cfColors));
@@ -362,15 +359,14 @@ public class Charts extends HttpServlet implements IErrorKeeper {
 	
 	/**
      * Helper method for getting the current user
-     *
      * @param req
      * @return
      */
     @SuppressWarnings("unused")
-	private User getCurrentUser(HttpServletRequest req) {
+	private ApplicationUser getCurrentUser(HttpServletRequest req) {
         // To get the current user, we first get the username from the session.
         // Then we pass that over to the jiraUserManager in order to get an actual User object.
-        return jiraUserManager.getUserByName(
+        return (ApplicationUser) jiraUserManager.getUserByName(
         		userManager.getRemoteUsername(req)).getDirectoryUser();
     }
 }
