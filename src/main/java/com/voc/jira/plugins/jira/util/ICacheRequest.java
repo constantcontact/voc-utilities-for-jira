@@ -38,7 +38,7 @@ public interface ICacheRequest {
 	 */
 	boolean getLatest();
 
-	/** True if user is requesting the latest. False if we should try to find the value in the cache.
+	/** True if configured to use a memcached server. False if the value should be fetched each time.
 	 * @return
 	 */
 	boolean isMemcached();
