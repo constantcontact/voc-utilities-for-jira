@@ -35,21 +35,15 @@ public class Cache {
 		return get(r,c);
 	}
 	
-	public void shutdown(ICacheRequest r) {
-		MemcachedClient c = null;
-		if(r.isMemcached()) {
-			c = CachePool.getInstance(r.host(), r.port()).getClient();
-		}
-		/*
-		final String key = r.key().replaceAll(" ", "_");
-		Future<Object> future = c.asyncGet(key);
-		Object result = future.cancel(false);
-		*/
-		c.shutdown();
-	}
-	
+	/**
+	 * Get cached issues, unless memcached is disabled in the VOC Utilities administration console 
+	 * or the memcached client is null.
+	 * @param r
+	 * @param c
+	 * @return
+	 */
 	static Object get(ICacheRequest r, MemcachedClient c) {
-		if (null == c) {
+		if (!r.isMemcached() || null == c) {
 			return r.transform(r.get());
 		}
 		final String key = r.key().replaceAll(" ", "_");
@@ -73,6 +67,19 @@ public class Cache {
 			}
 			return val;
 		}
+	}
+	
+	public void shutdown(ICacheRequest r) {
+		MemcachedClient c = null;
+		if(r.isMemcached()) {
+			c = CachePool.getInstance(r.host(), r.port()).getClient();
+		}
+		/*
+		final String key = r.key().replaceAll(" ", "_");
+		Future<Object> future = c.asyncGet(key);
+		Object result = future.cancel(false);
+		*/
+		if (c != null) { c.shutdown(); }
 	}
 	
 	private static int getTtl(ICacheRequest r) {
