@@ -79,7 +79,7 @@ public class Cache {
 		Future<Object> future = c.asyncGet(key);
 		Object result = future.cancel(false);
 		*/
-		if (c != null) { c.shutdown(); };
+		if (c != null) { c.shutdown(); }
 	}
 	
 	private static int getTtl(ICacheRequest r) {
