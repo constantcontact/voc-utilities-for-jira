@@ -20,7 +20,7 @@ import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.issue.link.IssueLinkManager;
 import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.LinkCollection;
-import com.atlassian.sal.api.search.SearchProvider;
+import com.atlassian.jira.issue.search.SearchException;
 import com.atlassian.jira.jql.builder.JqlQueryBuilder;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
@@ -30,6 +30,7 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.jira.util.MessageSetImpl;
+import com.atlassian.jira.web.bean.PagerFilter;
 import com.atlassian.query.Query;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
@@ -46,7 +47,6 @@ public class LinkedIssueTypeCreatedBeforeQuery extends AbstractJqlFunction {
 	@SuppressWarnings("unused") private volatile JqlFunctionModuleDescriptor descriptor; //initialized by JIRA
 	private I18nHelper i18n = ComponentAccessor.getJiraAuthenticationContext().getI18nHelper();
 	
-	
 	public LinkedIssueTypeCreatedBeforeQuery (
 			IssueTypeManager issueTypeManager,
 			IssueLinkManager issueLinkManager,
@@ -56,7 +56,6 @@ public class LinkedIssueTypeCreatedBeforeQuery extends AbstractJqlFunction {
 		this.issueLinkManager = issueLinkManager;
 		this.searchService = searchService;
 	}
-	
 	
 	/**
 	 * Used to find plugin resources.
@@ -125,7 +124,7 @@ public class LinkedIssueTypeCreatedBeforeQuery extends AbstractJqlFunction {
 		return literals;
 	}
 	
-	private List<Long> getIssueIDs(ApplicationUser user, QueryCreationContext queryCreationContext, 
+	private List<Long> getIssueIDs(ApplicationUser applicationUser, QueryCreationContext queryCreationContext, 
 			List<String> arguments) {
 		/* Given a filter and an issueType,
 		 * When applying the filter to get a list of issues
@@ -138,31 +137,25 @@ public class LinkedIssueTypeCreatedBeforeQuery extends AbstractJqlFunction {
 		List<Long> linkedIssueIDs = new ArrayList<Long>();
 		//Search on filter and iterate through issues
 		//Collection<Issue> filteredIssues = Collections.emptyList();
-		final Query query = getQuery(user, queryStr);
-		SearchProvider searchProvider = (SearchProvider) ComponentAccessor.getComponent(SearchProvider.class);
-		@SuppressWarnings("unchecked")
-		final Iterable<Issue> filteredIssues = (Iterable<Issue>) 
-				searchProvider.search(user.getDisplayName(), query.toString()); 
-						//PagerFilter.getUnlimitedFilter()).getIssues();
-		if (filteredIssues.iterator().hasNext()) {
-			final Issue issue = filteredIssues.iterator().next();
-			// System.out.println("In parsing search list: issue ID = " + issue.getId());
-			linkedIssueIDs.addAll(getLinkedIssueIDs(user, issue, issueType));
+		final Query query = getQuery(applicationUser, queryStr);
+		//System.out.println("SearchRequest query: " + ofilter.getQuery().getQueryString()); //.getName());
+		try {
+			SearchService searchService = ComponentAccessor.getComponent(SearchService.class);
+			ArrayList<Issue> issuesList = new ArrayList<Issue>();
+			issuesList = (ArrayList<Issue>) searchService.search(applicationUser, query, 
+					PagerFilter.getUnlimitedFilter()).getIssues();
+			//System.out.println("issue list size: " + issuesList.size());
+			for (final Issue issue : issuesList) {
+				// System.out.println("In parsing search list: issue ID = " + issue.getId());
+				linkedIssueIDs.addAll(getLinkedIssueIDs(applicationUser, issue, issueType));
+			}
+		} catch(SearchException e) {
+			log.error("SearchException: ", e);
 		}
-		/*
-		ArrayList<Issue> issuesList = new ArrayList<Issue>();
-		issuesList = (ArrayList<Issue>) searchProvider.search(query, applicationUser, 
-				PagerFilter.getUnlimitedFilter()).getIssues();
-		//System.out.println("issue list size: " + issuesList.size());
-		for (final Issue issue : issuesList) {
-			// System.out.println("In parsing search list: issue ID = " + issue.getId());
-			linkedIssueIDs.addAll(getLinkedIssueIDs(user, issue, issueType));
-		}
-		*/
 		return linkedIssueIDs;
 	}
 	
-	private Query getQuery(ApplicationUser user, String queryStr) {
+	private Query getQuery(ApplicationUser applicationUser, String queryStr) {
 		if (queryStr == null) {
 			log.warn(i18n.getText("linkedIssuetypeCreatedBeforeQuery.query.null", queryStr));
 			return JqlQueryBuilder.newBuilder().buildQuery();
@@ -171,7 +164,7 @@ public class LinkedIssueTypeCreatedBeforeQuery extends AbstractJqlFunction {
 			log.warn(i18n.getText("linkedIssuetypeCreatedBeforeQuery.query.empty", queryStr));
 			return JqlQueryBuilder.newBuilder().buildQuery();
 		}
-        SearchService.ParseResult parseResult = searchService.parseQuery(user, queryStr);
+        SearchService.ParseResult parseResult = searchService.parseQuery(applicationUser, queryStr);
         if(!parseResult.isValid()) {
 			log.warn(i18n.getText("linkedIssuetypeCreatedBeforeQuery.query.invalid", queryStr));
         	return JqlQueryBuilder.newBuilder().buildQuery();	
@@ -179,11 +172,11 @@ public class LinkedIssueTypeCreatedBeforeQuery extends AbstractJqlFunction {
         return parseResult.getQuery();        
     }
 	
-	private ArrayList<Long> getLinkedIssueIDs(ApplicationUser user, Issue issue, String issueType) {
+	private ArrayList<Long> getLinkedIssueIDs(ApplicationUser applicationUser, Issue issue, String issueType) {
 		Collection<Issue> linkedIssues = new LinkedList<Issue>();
 		ArrayList<Long> linkedIssueIDs = new ArrayList<Long>();
 		try {
-	        linkCollection = issueLinkManager.getLinkCollection(issue, user);
+	        linkCollection = issueLinkManager.getLinkCollection(issue, applicationUser);
 	        Set<IssueLinkType> linkTypes = linkCollection.getLinkTypes();
 	        for (IssueLinkType linkType : linkTypes) {
 			    // Get the outward linked issues
@@ -224,7 +217,7 @@ public class LinkedIssueTypeCreatedBeforeQuery extends AbstractJqlFunction {
 
 	@Override
 	@Nonnull
-	public MessageSet validate(ApplicationUser searcherApplicationUser, @Nonnull FunctionOperand operand,
+	public MessageSet validate(ApplicationUser searcher, @Nonnull FunctionOperand operand,
 			@Nonnull TerminalClause terminalClause) {
 		
 		//System.out.println("==== IN validate ====");
@@ -243,7 +236,7 @@ public class LinkedIssueTypeCreatedBeforeQuery extends AbstractJqlFunction {
 	    
 	    final String query = arguments.get(0);
 	    MessageSet queryMessages = new MessageSetImpl();
-	    queryMessages = validateQuery(searcherApplicationUser, query, messages);
+	    queryMessages = validateQuery(searcher, query, messages);
 	    if(queryMessages.hasAnyErrors()) {
 	    	messages.addMessageSet(queryMessages);
 	    }

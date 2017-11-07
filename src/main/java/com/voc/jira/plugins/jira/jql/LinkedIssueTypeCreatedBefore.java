@@ -13,6 +13,7 @@ import com.atlassian.jira.JiraDataTypes;
 import com.atlassian.jira.bc.JiraServiceContext;
 import com.atlassian.jira.bc.JiraServiceContextImpl;
 import com.atlassian.jira.bc.filter.SearchRequestService;
+import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.IssueTypeManager;
 import com.atlassian.jira.issue.Issue;
@@ -20,7 +21,7 @@ import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.issue.link.IssueLinkManager;
 import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.LinkCollection;
-import com.atlassian.sal.api.search.SearchProvider;
+import com.atlassian.jira.issue.search.SearchException;
 import com.atlassian.jira.issue.search.SearchRequest;
 import com.atlassian.jira.jql.operand.QueryLiteral;
 import com.atlassian.jira.jql.query.QueryCreationContext;
@@ -37,6 +38,7 @@ import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.jira.util.MessageSetImpl;
 import com.atlassian.jira.util.SimpleErrorCollection;
+import com.atlassian.jira.web.bean.PagerFilter;
 import com.atlassian.query.clause.TerminalClause;
 import com.atlassian.query.operand.FunctionOperand;
 
@@ -44,6 +46,10 @@ import com.atlassian.query.operand.FunctionOperand;
  * LinkedIssueTypeCreatedBefore
  * e.g. issues in linkedIssueTypeCreatedBefore("Project Team Filter","Support Request")
  * @author djelliso
+ *
+ */
+/**
+ * @author acheng
  *
  */
 public class LinkedIssueTypeCreatedBefore extends AbstractJqlFunction {	
@@ -57,6 +63,7 @@ public class LinkedIssueTypeCreatedBefore extends AbstractJqlFunction {
 	private LinkCollection linkCollection;
 	@SuppressWarnings("unused") private volatile JqlFunctionModuleDescriptor descriptor; //initialized by JIRA
 	private I18nHelper i18n = ComponentAccessor.getJiraAuthenticationContext().getI18nHelper();
+	
 	
 	public LinkedIssueTypeCreatedBefore (
 			IssueTypeManager issueTypeManager,
@@ -150,14 +157,19 @@ public class LinkedIssueTypeCreatedBefore extends AbstractJqlFunction {
 		//Search on filter and iterate through issues
 		//Collection<Issue> filteredIssues = Collections.emptyList();
 		SearchRequest ofilter = getFilterByName(applicationUser, filtername);
-		SearchProvider searchProvider = (SearchProvider) ComponentAccessor.getComponent(SearchProvider.class);
-		//SearchResults issueResults;
-		@SuppressWarnings("unchecked")
-		final Iterable<Issue> filteredIssues = (Iterable<Issue>) searchProvider.search(applicationUser.toString(), ofilter.getQuery().toString()); 
-		if (filteredIssues.iterator().hasNext()) {
-			final Issue issue = filteredIssues.iterator().next();
-			// System.out.println("In parsing search list: issue ID = " + issue.getId());
-			linkedIssueIDs.addAll(getLinkedIssueIDs(applicationUser, issue, issueType));
+		//System.out.println("SearchRequest query: " + ofilter.getQuery().getQueryString()); //.getName());
+		try {
+			SearchService searchService = ComponentAccessor.getComponent(SearchService.class);
+			ArrayList<Issue> issuesList = new ArrayList<Issue>();
+			issuesList = (ArrayList<Issue>) searchService.search( applicationUser, ofilter.getQuery(), 
+					PagerFilter.getUnlimitedFilter()).getIssues();
+			//System.out.println("issue list size: " + issuesList.size());
+			for (final Issue issue : issuesList) {
+				// System.out.println("In parsing search list: issue ID = " + issue.getId());
+				linkedIssueIDs.addAll(getLinkedIssueIDs(applicationUser, issue, issueType));
+			}
+		} catch(SearchException e) {
+			log.error("SearchException: ", e);
 		}
 		return linkedIssueIDs;
 	}
@@ -226,8 +238,9 @@ public class LinkedIssueTypeCreatedBefore extends AbstractJqlFunction {
 		return linkedIssueIDs;
 	}
 
+	@Override
 	@Nonnull
-	public MessageSet validate(ApplicationUser searcherApplicationUser, @Nonnull FunctionOperand operand,
+	public MessageSet validate(ApplicationUser searcher, @Nonnull FunctionOperand operand,
 			@Nonnull TerminalClause terminalClause) {
 		
 		//System.out.println("==== IN validate ====");
@@ -248,6 +261,7 @@ public class LinkedIssueTypeCreatedBefore extends AbstractJqlFunction {
 	    
 	    final String filter = arguments.get(0);
 	    MessageSet filterMessages = new MessageSetImpl();
+	    ApplicationUser searcherApplicationUser = searcher;
 	    filterMessages = validateFiltername(searcherApplicationUser, filter, messages);
 	    if(filterMessages.hasAnyErrors()) {
 	    	messages.addMessageSet(filterMessages);
