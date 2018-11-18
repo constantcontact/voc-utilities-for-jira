@@ -22,6 +22,12 @@ VOC Utilities plugin for Jira 7.x is a collection of features specific to the Vo
 
 ## Build History
 
+### version 4.0.2-Jira7
+<ol>
+  <li>Support for Jira v7.0.x to v7.12.x</li>
+  <l1>Updated httpclient to v4.2.3 to fix a security vulnerability</l1>
+</ol>
+
 ### version 4.0.1-Jira7
 <ol>
   <li>Support for Jira v7.5.0</li>
